@@ -21,12 +21,14 @@ import {
   BookOpen,
   BookMarked,
   Boxes,
+  Bot,
 } from 'lucide-react';
 
 /** The workspaces, in navigation order. `tKey` resolves as `nav.<tKey>`. */
 export const NAV_ITEMS = [
   { id: 'launchpad', Icon: Globe, tKey: 'launchpad', accent: '#f3a5b6' },
   { id: 'studio', Icon: Fingerprint, tKey: 'voice', accent: '#d3869b' },
+  { id: 'agents', Icon: Bot, tKey: 'agents', accent: '#8f8ef0' },
   { id: 'dub', Icon: Film, tKey: 'dub', accent: '#fe8019' },
   { id: 'stories', Icon: BookOpen, tKey: 'stories', accent: '#fabd2f' },
   { id: 'audiobook', Icon: BookMarked, tKey: 'audiobook', accent: '#8ec07c' },

@@ -147,7 +147,8 @@ class OpenAICompatBackend(LLMBackend):
         )
 
     def chat_messages(self, *, messages: list[dict], timeout: Optional[float] = None,
-                      temperature: Optional[float] = None) -> str:
+                      temperature: Optional[float] = None,
+                      max_tokens: Optional[int] = None) -> str:
         """One-shot completion over a full message list.
 
         Additive surface for callers that need structured few-shot turns
@@ -158,6 +159,9 @@ class OpenAICompatBackend(LLMBackend):
         ``temperature`` is only forwarded when set (Cinematic/Autofit pin 0.2
         — the provider default of 1.0 makes local models drift and invent);
         every other caller leaves it None and keeps the provider default.
+        ``max_tokens`` follows the same forward-only-when-set rule; it exists
+        for the OpenAI-compatible chat endpoint, which must honour a client's
+        limit rather than quietly return more than it asked for.
         """
         if timeout is None:
             try:
@@ -167,6 +171,8 @@ class OpenAICompatBackend(LLMBackend):
         kw = {}
         if temperature is not None:
             kw["temperature"] = temperature
+        if max_tokens is not None:
+            kw["max_tokens"] = max_tokens
         res = self._get_client().chat.completions.create(
             model=self.model_name,
             timeout=timeout,
@@ -174,6 +180,64 @@ class OpenAICompatBackend(LLMBackend):
             **kw,
         )
         return (res.choices[0].message.content or "").strip()
+
+    def chat_messages_stream(self, *, messages: list[dict],
+                             timeout: Optional[float] = None,
+                             temperature: Optional[float] = None,
+                             max_tokens: Optional[int] = None):
+        """Yield assistant content deltas as they arrive.
+
+        Additive alongside ``chat_messages`` — same request, ``stream=True``.
+        Exists for the conversational agent (``services/conversation.py``),
+        where the whole latency budget depends on starting TTS on the first
+        finished sentence instead of waiting for the full completion. A
+        one-shot call would put the entire generation time in front of the
+        first spoken word.
+
+        The generator is the cancellation point: closing it (an
+        ``asyncio.Task`` cancellation, or a ``break`` on barge-in) closes the
+        underlying HTTP stream, so an interrupted turn stops costing tokens
+        immediately rather than running to completion unheard.
+
+        Deltas are yielded raw and un-stripped: the caller reassembles
+        sentences, and stripping here would eat the spaces between chunks.
+        """
+        if timeout is None:
+            try:
+                timeout = float(os.environ.get("OMNIVOICE_LLM_TIMEOUT", "45"))
+            except ValueError:
+                timeout = 45.0
+        kw = {}
+        if temperature is not None:
+            kw["temperature"] = temperature
+        if max_tokens is not None:
+            kw["max_tokens"] = max_tokens
+        stream = self._get_client().chat.completions.create(
+            model=self.model_name,
+            timeout=timeout,
+            messages=messages,
+            stream=True,
+            **kw,
+        )
+        try:
+            for chunk in stream:
+                # A chunk can carry an empty choices list (some providers send
+                # a usage-only final frame), and a delta can have content None
+                # on the role-announcement frame. Neither is an error.
+                if not chunk.choices:
+                    continue
+                delta = getattr(chunk.choices[0].delta, "content", None)
+                if delta:
+                    yield delta
+        finally:
+            # Release the connection promptly on early exit (barge-in). Not
+            # every provider client exposes close(); best-effort by design.
+            close = getattr(stream, "close", None)
+            if callable(close):
+                try:
+                    close()
+                except Exception:
+                    logger.debug("llm stream close failed", exc_info=True)
 
 
 # ── Off — explicit no-LLM path ────────────────────────────────────────────
@@ -199,6 +263,17 @@ class OffBackend(LLMBackend):
 
     def chat_messages(self, **kw) -> str:
         return self.chat(**kw)
+
+    def chat_messages_stream(self, **kw):
+        # Deliberately NOT a generator function. A `yield` here would make the
+        # call return a generator and defer the raise to first iteration,
+        # surfacing "no LLM configured" somewhere unhelpful — mid-turn, after
+        # the caller has already told the user the agent is thinking. Raising
+        # on call means the readiness check fails before anyone hears silence.
+        raise RuntimeError(
+            "No LLM backend configured. Set TRANSLATE_BASE_URL (+ TRANSLATE_API_KEY) "
+            "or add a provider in Settings → LLM Providers to use voice agents."
+        )
 
 
 _REGISTRY: dict[str, type[LLMBackend]] = {

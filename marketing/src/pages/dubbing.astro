@@ -1,0 +1,80 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+
+const steps = [
+  ['Transcribe', 'Speech to text with speaker diarization, so who said what survives the trip.'],
+  ['Translate', 'Per-segment, with a glossary for the terms that must not drift.'],
+  ['Re-voice', 'Each speaker keeps a voice of their own, cloned from their own audio in the source.'],
+  ['Fit', 'Translated lines rarely match the original length. Timing is planned per segment so the result still lands on the picture.'],
+  ['Export', 'Burned-in or sidecar subtitles, remuxed video, or the audio alone.'],
+];
+---
+
+<Base
+  title="Dubbing"
+  description="Transcribe, translate and re-voice video while keeping each speaker's timing and delivery. 646 languages."
+>
+  <PageHeader
+    overline="Dubbing"
+    title="Video, in someone else’s language"
+    lede="Keep the speakers, the timing, and the delivery. 646 languages in the catalogue, and a segment table where you can fix anything the pipeline got wrong."
+  />
+
+  <section class="section page">
+    <ol class="steps">
+      {steps.map(([name, detail], i) => (
+        <li>
+          <span class="step-index">{String(i + 1).padStart(2, '0')}</span>
+          <div>
+            <h2>{name}</h2>
+            <p>{detail}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+</Base>
+
+<style>
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sn-space-7);
+    max-width: var(--sn-measure-prose);
+  }
+
+  .steps li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: var(--sn-space-6);
+    align-items: start;
+    padding-bottom: var(--sn-space-7);
+    border-bottom: 1px solid var(--sn-border);
+  }
+
+  .steps li:last-child {
+    border-bottom: 0;
+  }
+
+  .step-index {
+    font-family: var(--sn-font-mono);
+    font-size: var(--sn-text-caption);
+    color: var(--sn-text-subtle);
+    padding-top: 0.35em;
+  }
+
+  .steps h2 {
+    margin: 0 0 var(--sn-space-3);
+    font-size: var(--sn-text-title-lg);
+    font-weight: var(--sn-weight-title-lg);
+  }
+
+  .steps p {
+    margin: 0;
+    color: var(--sn-text-muted);
+    font-size: var(--sn-text-body-sm);
+  }
+</style>

@@ -1,5 +1,6 @@
 # VoiceStudio backend API route snapshot — regenerate with scripts/dump_api_routes.py
 # Guards against accidental endpoint removal/rename (tests/test_api_route_inventory.py).
+DELETE /agents/{agent_id}
 DELETE /api/auth/session
 DELETE /api/mcp/bindings/{client_id}
 DELETE /api/settings/hf-token
@@ -19,9 +20,13 @@ DELETE /profiles/{profile_id}
 DELETE /profiles/{profile_id}/consent
 DELETE /projects/{project_id}
 DELETE /pronunciation/{entry_id}
+DELETE /telephony/allowlist/{e164}
 DELETE /workers/inbound/connections/{endpoint}
 DELETE /workers/inbound/keys/{key_id}
 DELETE /workers/{worker_id}
+GET /agents
+GET /agents/{agent_id}
+GET /agents/{agent_id}/readiness
 GET /api/mcp/bindings
 GET /api/settings/analytics
 GET /api/settings/asr-openai-compat
@@ -138,9 +143,12 @@ GET /system/notifications
 GET /system/quarantine-status
 GET /system/tailscale/status
 GET /tasks/stream/{task_id}
+GET /telephony/allowlist
+GET /telephony/calls
 GET /tools/effects
 GET /tools/plugins
 GET /v1/audio/voices
+GET /v1/models
 GET /watermark/status
 GET /workers
 GET /workers/agent
@@ -151,6 +159,7 @@ GET /workers/tasks
 PATCH /gallery/voices/{voice_id}
 PATCH /projects/{project_id}
 PATCH /workers/{worker_id}
+POST /agents
 POST /api/auth/session
 POST /api/auth/ws-ticket
 POST /api/settings/asr-openai-compat/test
@@ -245,6 +254,9 @@ POST /system/set-env
 POST /system/tailscale/disable
 POST /system/tailscale/enable
 POST /tasks/cancel/{task_id}
+POST /telephony/allowlist
+POST /telephony/calls
+POST /telephony/preflight
 POST /tools/direction
 POST /tools/incremental
 POST /tools/probe
@@ -253,6 +265,7 @@ POST /tools/video-context/{job_id}
 POST /transcribe
 POST /v1/audio/speech
 POST /v1/audio/transcriptions
+POST /v1/chat/completions
 POST /watermark/detect
 POST /watermark/settings
 POST /workers/agent/enabled
@@ -268,6 +281,7 @@ POST /workers/tasks
 POST /workers/tasks/{task_id}/cancel
 POST /workers/{worker_id}/consent
 POST /workers/{worker_id}/resume
+PUT /agents/{agent_id}
 PUT /api/mcp/bindings
 PUT /api/settings/analytics
 PUT /api/settings/asr-openai-compat
@@ -286,6 +300,7 @@ PUT /history/{history_id}/starred
 PUT /profiles/{profile_id}
 PUT /projects/{project_id}
 PUT /pronunciation/{entry_id}
+WS /ws/converse
 WS /ws/events
 WS /ws/transcribe
 WS /ws/tts

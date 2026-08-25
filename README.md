@@ -47,7 +47,7 @@
 | **Engines** | 16 TTS · 11 ASR · switch in Model Catalogue or with <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>E</kbd> |
 | **Platforms** | macOS 13.3+ on Apple Silicon · Windows 10/11 x64 · Linux x86_64 with glibc 2.39+ |
 | **Compute** | CUDA · Apple Silicon MPS/MLX · ROCm on Linux · CPU · optional remote workers |
-| **Interfaces** | Desktop app · local REST/SSE/WebSocket API · OpenAI-compatible audio API · MCP Server |
+| **Interfaces** | Desktop app · local REST/SSE/WebSocket API · OpenAI-compatible audio and chat API · MCP Server |
 | **Storage** | Voices, projects, settings, and outputs stay on the machine by default |
 | **License** | AGPL-3.0; optional engines keep their own model licenses |
 
@@ -99,6 +99,7 @@ Use `bun run dev` for the browser UI. See [Contributing](.github/CONTRIBUTING.md
 
 | Area | Included |
 |---|---|
+| **[Voice Agents](docs/telephony.md)** | Give an agent a voice and a brief, then talk to it — streamed replies, sentence-by-sentence speech, and barge-in |
 | **Voice Cloning** | Zero-shot synthesis from a short reference clip |
 | **Voice Design** | Create a voice from age, accent, pitch, style, and delivery instructions |
 | **Video Dubbing** | Transcribe, translate, preserve speakers, synthesize, and export video |
@@ -268,6 +269,8 @@ Point an OpenAI-compatible audio client at the local backend:
 | `POST /v1/audio/speech` | TTS to `mp3`, `opus`, `aac`, `flac`, `wav`, or `pcm`; select a profile with `voice` and an engine with `model` |
 | `POST /v1/audio/transcriptions` | STT to `json`, `text`, `verbose_json`, `srt`, or `vtt` |
 | `GET /v1/audio/voices` | List local voice profiles and engines |
+| `POST /v1/chat/completions` | Chat, streaming or one-shot — relayed to whichever LLM the install is configured to use |
+| `GET /v1/models` | The one model that relay serves |
 
 ```python
 from openai import OpenAI
@@ -282,6 +285,8 @@ with client.audio.speech.with_streaming_response.create(
 ) as response:
     response.stream_to_file("speech.wav")
 ```
+
+`/v1/chat/completions` owns no model: it forwards to the LLM configured under `TRANSLATE_BASE_URL` or Settings → LLM Providers, so any tool with a "custom OpenAI provider" setting can share it. See [agentic voice](docs/agentic-voice.md).
 
 The full API reference is in **Settings → OpenAPI Reference**. For LAN, Tailscale, or proxy access, read [API authentication](docs/api-auth.md) before exposing the backend.
 

@@ -1,0 +1,28 @@
+---
+interface Props {
+  overline: string;
+  title: string;
+  lede?: string;
+}
+
+const { overline, title, lede } = Astro.props;
+---
+
+<header class="section page page-header">
+  <p class="overline">{overline}</p>
+  <h1 class="display-xl">{title}</h1>
+  {lede && <p class="lede">{lede}</p>}
+</header>
+
+<style>
+  .page-header {
+    display: grid;
+    gap: var(--sn-space-6);
+    justify-items: start;
+    padding-bottom: var(--sn-space-7);
+  }
+
+  .page-header h1 {
+    max-width: 18ch;
+  }
+</style>

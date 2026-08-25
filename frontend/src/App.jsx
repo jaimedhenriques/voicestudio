@@ -38,6 +38,7 @@ const TranscriptionsPage = lazy(() => import('./pages/Transcriptions'));
 const StoriesEditor = lazy(() => import('./components/StoriesEditor'));
 const AudiobookTab = lazy(() => import('./pages/AudiobookTab'));
 const ModelCataloguePage = lazy(() => import('./pages/ModelCatalogue'));
+const AgentsPage = lazy(() => import('./pages/Agents'));
 
 import Header from './components/Header';
 import NavRail from './components/NavRail';
@@ -202,6 +203,9 @@ function App() {
   // zustand persist rehydrates (async from localStorage) and when the user
   // changes them at runtime.
   useEffect(() => {
+    // Gruvbox is the bare `:root` (no [data-theme] block), so it is the one
+    // theme applied by REMOVING the attribute. `theme` is never empty — the
+    // store defaults to 'sonari' — but keep the guard for a corrupted persist.
     if (theme && theme !== 'gruvbox') {
       document.documentElement.setAttribute('data-theme', theme);
     } else {
@@ -318,6 +322,7 @@ function App() {
     mode === 'contact' ||
     mode === 'transcriptions' ||
     mode === 'catalogue' ||
+    mode === 'agents' ||
     mode === 'stories' ||
     mode === 'audiobook' ||
     // Voice (studio) and Dub workspaces moved their saved voices /
@@ -1531,6 +1536,12 @@ function App() {
           <ErrorBoundary name="catalogue">
             <Suspense fallback={<LazyFallback />}>
               <ModelCataloguePage />
+            </Suspense>
+          </ErrorBoundary>
+        ) : mode === 'agents' ? (
+          <ErrorBoundary name="agents">
+            <Suspense fallback={<LazyFallback />}>
+              <AgentsPage profiles={profiles} />
             </Suspense>
           </ErrorBoundary>
         ) : mode === 'stories' ? (

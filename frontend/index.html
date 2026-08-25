@@ -1,12 +1,48 @@
 <!doctype html>
-<html lang="en">
+<!-- The background lives on <html>, not <body>: the script below runs in <head>,
+     where document.body is still null, and browsers propagate the root element's
+     background to the canvas anyway. Value matches --color-bg in the Sonari
+     theme, so the first painted frame is already the right colour. -->
+<html lang="en" data-theme="sonari" style="background: #0b0b0c">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>VoiceStudio</title>
+    <title>Sonari</title>
+    <script>
+      /*
+        Theme resolution before first paint.
+
+        <html> carries data-theme="sonari" (the store default) so a fresh
+        install paints the brand theme immediately. An existing install has a
+        different theme persisted in localStorage, and zustand rehydrates
+        asynchronously — without this, that user would see a frame of Sonari
+        before their own choice was restored.
+
+        Gruvbox is the one theme with no [data-theme] block: it IS the bare
+        `:root`, so applying it means removing the attribute. Same rule as
+        setTheme() in src/store/prefsSlice.ts.
+
+        Wrapped in try/catch because localStorage throws outright in some
+        privacy modes and JSON.parse throws on a corrupted entry — either would
+        block the document. Falling through leaves the markup default, which is
+        a valid theme.
+      */
+      try {
+        var persisted = localStorage.getItem('omnivoice.app');
+        var theme = persisted && JSON.parse(persisted).state.theme;
+        if (theme === 'gruvbox') {
+          document.documentElement.removeAttribute('data-theme');
+          document.documentElement.style.background = '#1d2021';
+        } else if (theme) {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+      } catch (e) {
+        /* no usable persisted theme — the markup default stands */
+      }
+    </script>
   </head>
-  <body style="background:#1d2021">
+  <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

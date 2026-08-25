@@ -7,7 +7,8 @@
   "main": "./src/tokens.ts",
   "exports": {
     ".": "./src/tokens.ts",
-    "./tokens.css": "./dist/tokens.css"
+    "./tokens.css": "./dist/tokens.css",
+    "./app-theme": "./src/app-theme.ts"
   },
   "files": [
     "src",

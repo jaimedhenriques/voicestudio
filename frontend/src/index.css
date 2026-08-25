@@ -563,6 +563,45 @@
   --select-caret: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%226%22%3E%3Cpath%20d%3D%22M1%201l4%204%204-4%22%20fill%3D%22none%22%20stroke%3D%22%23a6adc8%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E");
 }
 
+/* ── Sonari ────────────────────────────────────────────────────────────
+   The brand theme, and the default for new installs. Generated from
+   packages/design-tokens (src/app-theme.ts) so it cannot drift from the
+   marketing site; frontend/src/test/sonariTheme.test.js asserts this block
+   matches renderAppThemeBlock() exactly. Edit the token package, not here.
+
+   Placed LAST among the [data-theme] blocks and after every default :root —
+   see the cascade note at the top of this file. */
+[data-theme="sonari"] {
+  --color-fg:            #f2f2f0;
+  --color-fg-muted:      #9a9a94;
+  --color-fg-subtle:     #6e6e69;
+  --color-fg-inverse:    #0b0b0c;
+  --color-bg:            #0b0b0c;
+  --color-bg-elev-1:     rgba(20, 20, 22, 0.85);
+  --color-bg-elev-2:     rgba(11, 11, 12, 0.40);
+  --color-bg-elev-3:     rgba(29, 29, 28, 0.30);
+  --color-border:        rgba(242, 242, 240, 0.10);
+  --color-border-strong: rgba(242, 242, 240, 0.18);
+  --color-border-warm:   rgba(143, 142, 240, 0.12);
+  --color-brand:         #8f8ef0;
+  --color-brand-hover:   #a5a4f4;
+  --color-brand-glow:    rgba(143, 142, 240, 0.35);
+  --color-accent:        #d99b4a;
+  --color-success:       #4ec98a;
+  --color-warn:          #e0a84a;
+  --color-danger:        #f0837a;
+  --color-info:          #6fb6cf;
+  --chrome-bg:           #141416;
+  --chrome-fg:           #f2f2f0;
+  --chrome-fg-muted:     #9a9a94;
+  --chrome-fg-dim:       #4a4a47;
+  --chrome-border:       #26262a;
+
+  /* Sonari — bg #0b0b0c is dark. */
+  color-scheme: dark;
+  --select-caret: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2210%22%20height%3D%226%22%3E%3Cpath%20d%3D%22M1%201l4%204%204-4%22%20fill%3D%22none%22%20stroke%3D%22%239a9a94%22%20stroke-width%3D%221.5%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E");
+}
+
 /* ── System-preference sync ────────────────────────────────────────── */
 /* When theme is "auto", the light theme activates on light-mode OS.
    Currently we don't ship a light theme; this is scaffolding for
@@ -6905,4 +6944,216 @@ button.dub-stepper__action:focus-visible {
     min-height: 96px;
     max-height: 96px;
   }
+}
+
+/* ═══ AGENTS WORKSPACE ═══
+   Two columns: a list rail and the detail stack. Uses the same token scale as
+   every other workspace, so it recolours with each [data-theme] for free. */
+
+.agents-page {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: var(--space-6);
+  padding: var(--space-6);
+  align-items: start;
+  min-height: 0;
+}
+
+.agents-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.agents-list-head h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+  color: var(--color-fg);
+}
+
+.agents-list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-2);
+}
+
+.agents-list button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--color-fg-muted);
+  font-size: var(--text-base);
+  text-align: left;
+  cursor: pointer;
+}
+
+.agents-list button:hover {
+  background: var(--color-bg-elev-3);
+  color: var(--color-fg);
+}
+
+.agents-list button.is-selected {
+  background: var(--color-bg-elev-1);
+  border-color: var(--color-border-strong);
+  color: var(--color-fg);
+}
+
+.agents-list button span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agents-empty,
+.agents-hint {
+  color: var(--color-fg-subtle);
+  font-size: var(--text-sm);
+  margin: 0 0 var(--space-5);
+}
+
+.agents-hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.agents-detail {
+  display: grid;
+  gap: var(--space-6);
+  min-width: 0;
+}
+
+.agents-error {
+  color: var(--color-danger);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+.agents-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.agents-state {
+  color: var(--color-fg-subtle);
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+}
+
+.agents-readiness {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-4);
+}
+
+.agents-readiness li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  font-size: var(--text-base);
+  color: var(--color-fg);
+}
+
+.agents-readiness small {
+  grid-column: 2;
+  color: var(--color-fg-subtle);
+  font-size: var(--text-sm);
+}
+
+/* Fixed height with its own scroll: the transcript grows without pushing the
+   compose box off screen mid-conversation. */
+.agents-transcript {
+  max-height: 320px;
+  overflow-y: auto;
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elev-2);
+}
+
+.agents-line {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: 1.5;
+  /* Model output is arbitrary text — a long URL or an unbroken token would
+     otherwise widen the panel and push the layout sideways. */
+  overflow-wrap: anywhere;
+}
+
+.agents-line.is-user {
+  color: var(--color-fg);
+}
+.agents-line.is-assistant {
+  color: var(--color-fg-muted);
+}
+.agents-line.is-system {
+  color: var(--color-fg-subtle);
+  font-style: italic;
+}
+.agents-line.is-error {
+  color: var(--color-danger);
+}
+
+.agents-compose {
+  display: flex;
+  gap: var(--space-4);
+  margin-top: var(--space-5);
+}
+
+.agents-compose > :first-child {
+  flex: 1;
+}
+
+.agents-preflight blockquote {
+  margin: var(--space-4) 0 0;
+  padding: var(--space-5);
+  border-left: 2px solid var(--color-brand);
+  background: var(--color-bg-elev-2);
+  color: var(--color-fg);
+  font-size: var(--text-base);
+}
+
+@media (max-width: 900px) {
+  .agents-page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Agent voice visualiser — the ElevenLabs UI BarVisualizer, driven by the
+   real /ws/converse state. Colour comes from the theme's brand token so it
+   recolours with every [data-theme] like everything else. */
+.agents-visualizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  margin-bottom: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elev-2);
+  color: var(--color-brand);
+}
+
+/* The component sizes its bars from currentColor and the container box. */
+.agents-visualizer > * {
+  width: 100%;
+  height: 100%;
 }

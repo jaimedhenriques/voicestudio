@@ -31,7 +31,8 @@
     "smoke-test:upgrade": "bash scripts/smoke-test.sh --keep-data --skip-build",
     "deps:check": "taze -r --maturity-period 7",
     "test:packages": "turbo run test --filter=./packages/*",
-    "build:tokens": "bun run --cwd packages/design-tokens build"
+    "build:tokens": "bun run --cwd packages/design-tokens build",
+    "sync:app-theme": "bun scripts/sync-app-theme.mjs"
   },
   "workspaces": [
     "frontend",

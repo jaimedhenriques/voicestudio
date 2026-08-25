@@ -157,6 +157,8 @@ body {
   text-decoration: none;
   cursor: pointer;
   white-space: nowrap;
+  /* Suppresses the 300 ms tap delay without disabling pinch-zoom. */
+  touch-action: manipulation;
   transition:
     background-color var(--sn-duration-fast) var(--sn-ease-standard),
     border-color var(--sn-duration-fast) var(--sn-ease-standard),

@@ -15,7 +15,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "VoiceStudio",
+        "title": "Sonari",
         "width": 1920,
         "height": 1080,
         "minWidth": 900,

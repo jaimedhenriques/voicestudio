@@ -44,6 +44,48 @@ combined under, the GNU AGPL-3.0. See `pyproject.toml`.
 Third-party dependencies retain their own licenses. See `Cargo.lock`,
 `bun.lock`, and `uv.lock` for the resolved set.
 
+### Third-party components vendored into this repository
+
+Some third-party source is copied into this tree rather than installed as a
+dependency, so it does not appear in any lockfile. Each vendored file carries a
+header naming its origin; the licences are reproduced here.
+
+**ElevenLabs UI** — `frontend/src/components/ui/vendor/elevenlabs/`
+
+Copied from <https://github.com/elevenlabs/ui> (`apps/www/registry/elevenlabs-ui/ui/`).
+Vendored rather than installed because that project distributes through a
+shadcn registry aimed at Next.js app-router projects, while this app is
+Vite + React. `bar-visualizer.tsx` is unmodified apart from a dropped
+`"use client"` directive and two explicit type annotations, both marked
+`SONARI:` in-file — keeping the diff that small is what makes a future re-sync
+from upstream a fast-forward rather than a merge conflict.
+
+```
+MIT License
+
+Copyright (c) 2025 Eleven Labs Inc.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+MIT is compatible with, and may be combined under, the GNU AGPL-3.0.
+
 ### Reference
 
 The full canonical text of the GNU Affero General Public License, Version 3 is

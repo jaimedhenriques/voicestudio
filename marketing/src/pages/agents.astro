@@ -1,0 +1,129 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+
+// Every claim here maps to something in the repo. Nothing is aspirational, and
+// the calling status is stated rather than implied — see docs/telephony.md.
+const capabilities = [
+  {
+    title: 'It starts talking before it has finished thinking',
+    body: 'The reply streams from the language model, and each finished sentence is spoken while the next is still being generated. Waiting for a whole response before speaking puts the entire generation time in front of the first word.',
+  },
+  {
+    title: 'Interrupt it and it stops',
+    body: 'Barge-in cuts the audio locally first, then tells the server — so it goes quiet the instant you speak, not a round trip later. The model stops generating, and the agent remembers what it actually said rather than what it had planned to say.',
+  },
+  {
+    title: 'It uses your voice, with your permission',
+    body: 'An agent speaks with a cloned voice profile. Putting one on a phone call requires a profile you have confirmed is your own — recorded, not just ticked.',
+  },
+];
+
+const safeguards = [
+  ['Spoken disclosure', 'Every call opens by saying it is an AI using a synthetic voice. Generated server-side; the agent cannot shorten or skip it.'],
+  ['Consent-locked voice', 'A call can only use a voice profile the user confirmed is theirs.'],
+  ['Watermark, always', 'Agent audio carries an AudioSeal watermark with no off switch.'],
+  ['Allowlist and cap', 'A number must be added before it can be called, with a daily limit. There is no bulk-dial endpoint anywhere in the code.'],
+  ['Immutable log', 'Every attempt is recorded before a carrier is contacted, refusals included. Nothing deletes them.'],
+  ['Written-down rules', 'What the law requires and what is still missing, in public, before launch.'],
+];
+---
+
+<Base
+  title="Voice agents"
+  description="Agents that hold a real conversation: streamed replies, sentence-by-sentence speech, and interruption that actually works."
+>
+  <PageHeader
+    overline="Agents"
+    title="Agents that hold a real conversation"
+    lede="Give an agent a voice, a brief, and a first line. It listens, thinks, and answers — and it stops the moment someone talks over it."
+  />
+
+  <section class="section page">
+    <div class="stack">
+      {capabilities.map((item) => (
+        <article class="card">
+          <h2 class="display-sm">{item.title}</h2>
+          <p>{item.body}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section page">
+    <p class="overline">Phone calls</p>
+    <h2 class="display-lg">Built. Not switched on.</h2>
+    <p class="lede">
+      Outbound calling is written and tested. What does not exist yet is the carrier account,
+      the number registration, and per-customer verification — so it returns a clear error
+      rather than a phone call. We would rather say that here than have you discover it.
+    </p>
+
+    <ul class="safeguards">
+      {safeguards.map(([name, detail]) => (
+        <li>
+          <h3>{name}</h3>
+          <p>{detail}</p>
+        </li>
+      ))}
+    </ul>
+
+    <p class="note">
+      Placing AI voice calls is regulated — the FCC treats a synthetic voice as artificial under
+      the TCPA, Texas requires disclosure inside 30 seconds, and the EU AI Act's open-source
+      exemption does not cover its transparency duties. The safeguards above exist because of
+      that, not in spite of it.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .stack {
+    display: grid;
+    gap: var(--sn-space-5);
+    /* Capped to the reading measure. Left full-width the card stretched to
+       1150px around a 68ch paragraph, so two thirds of every card was empty. */
+    max-width: 78ch;
+  }
+
+  .card h2 {
+    margin-bottom: var(--sn-space-4);
+    max-width: 22ch;
+  }
+
+  .card p {
+    margin: 0;
+    color: var(--sn-text-muted);
+    max-width: var(--sn-measure-prose);
+  }
+
+  .safeguards {
+    list-style: none;
+    margin: var(--sn-space-8) 0 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--sn-space-7);
+  }
+
+  .safeguards h3 {
+    margin: 0 0 var(--sn-space-3);
+    font-size: var(--sn-text-title-sm);
+    font-weight: var(--sn-weight-title-sm);
+  }
+
+  .safeguards p {
+    margin: 0;
+    color: var(--sn-text-muted);
+    font-size: var(--sn-text-body-sm);
+  }
+
+  .note {
+    margin-top: var(--sn-space-8);
+    padding-left: var(--sn-space-5);
+    border-left: 2px solid var(--sn-border-strong);
+    color: var(--sn-text-subtle);
+    font-size: var(--sn-text-body-sm);
+    max-width: var(--sn-measure-prose);
+  }
+</style>
