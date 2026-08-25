@@ -56,6 +56,7 @@ _ALLOWED_FILES = {
     # Text-processing (CJK punctuation inside sentence/clause-splitting regexes)
     "backend/services/segmentation.py",
     "backend/services/sentence_chunker.py",       # streaming-TTS terminator tables (Patter port, Wave 1.4)
+    "backend/services/conversation.py",           # agent-turn terminator table: CJK has no space after 。, so requiring one would buffer a whole Chinese reply into one chunk
     "backend/services/subtitle_segmenter.py",
     "backend/core/http_headers.py",               # docstring quotes the CJK filename that 500'd the header (#1262)
     "frontend/src/components/DubSegmentRow.jsx",

@@ -81,7 +81,12 @@ describe('administrator credential hygiene static guard', () => {
     expect(violations, 'WebSocket URLs may contain ws_ticket, never a master key').toEqual([]);
   });
 
-  it('keeps both WebSocket consumers behind the authenticated URL boundary', () => {
+  it('keeps every WebSocket consumer behind the authenticated URL boundary', () => {
+    // An exhaustive list rather than a predicate: a NEW socket has to be added
+    // here deliberately, which is the moment someone checks that it mints a
+    // ticket. The agents conversation socket was caught by exactly this — it
+    // shipped building `ws://…` by hand and would have been the one
+    // unauthenticated transport in the app.
     const constructors = sources()
       .filter(({ source }) => source.includes('new WebSocket('))
       .map(({ file, source }) => ({ file, authenticated: source.includes('authenticatedWsUrl') }));
@@ -89,6 +94,7 @@ describe('administrator credential hygiene static guard', () => {
     expect(constructors).toEqual([
       { file: 'components/CaptureWidget.jsx', authenticated: true },
       { file: 'hooks/useRealtimeEvents.js', authenticated: true },
+      { file: 'utils/conversationSocket.js', authenticated: true },
     ]);
   });
 });
