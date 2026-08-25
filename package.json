@@ -29,10 +29,14 @@
     "smoke-test": "bash scripts/smoke-test.sh",
     "smoke-test:quick": "bash scripts/smoke-test.sh --skip-build --skip-model",
     "smoke-test:upgrade": "bash scripts/smoke-test.sh --keep-data --skip-build",
-    "deps:check": "taze -r --maturity-period 7"
+    "deps:check": "taze -r --maturity-period 7",
+    "test:packages": "turbo run test --filter=./packages/*",
+    "build:tokens": "bun run --cwd packages/design-tokens build"
   },
   "workspaces": [
-    "frontend"
+    "frontend",
+    "packages/*",
+    "marketing"
   ],
   "devDependencies": {
     "concurrently": "^9.2.4",

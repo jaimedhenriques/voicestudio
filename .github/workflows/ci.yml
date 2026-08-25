@@ -166,6 +166,14 @@ jobs:
         working-directory: frontend
         run: node --experimental-strip-types --no-warnings --test ../tests/frontend/*.test.mjs
 
+      # Shared workspace packages (@sonari/design-tokens, @sonari/brand). The
+      # design-tokens suite is the drift guard for the COMMITTED
+      # packages/design-tokens/dist/tokens.css: both the app and the marketing
+      # site @import that file directly with no build step, so it has to be
+      # provably the output of src/tokens.ts rather than something hand-edited.
+      - name: Run package tests (shared workspaces)
+        run: bun run test:packages
+
       # Production-bundle blank-screen gate. Everything above runs UN-minified
       # (dev server + Vitest/jsdom), so a crash that exists ONLY in the minified
       # release bundle — a TDZ reorder that throws before React mounts — passes

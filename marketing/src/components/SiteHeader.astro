@@ -1,0 +1,120 @@
+---
+import { BRAND, NAV } from '@sonari/brand';
+import Wordmark from './Wordmark.astro';
+
+const path = Astro.url.pathname;
+const isCurrent = (href: string) => path === href || path.startsWith(`${href}/`);
+---
+
+<header class="site-header">
+  <a class="skip-link" href="#main">Skip to content</a>
+  <div class="page header-inner">
+    <a href="/" class="brand" aria-label={`${BRAND.name} home`}>
+      <Wordmark />
+    </a>
+
+    <nav aria-label="Primary">
+      <ul>
+        {
+          NAV.product.map((item) => (
+            <li>
+              <a href={item.href} aria-current={isCurrent(item.href) ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+        <li>
+          <a href="/docs" aria-current={isCurrent('/docs') ? 'page' : undefined}>Docs</a>
+        </li>
+      </ul>
+    </nav>
+
+    <div class="actions">
+      <a class="btn btn-outline" href="/download">Download</a>
+      <a class="btn btn-primary" href={BRAND.appUrl}>Open studio</a>
+    </div>
+  </div>
+  <hr class="hairline" />
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    background: color-mix(in srgb, var(--sn-bg) 88%, transparent);
+    backdrop-filter: blur(12px);
+  }
+
+  /* The skip link is the first focusable thing on every page. It is visually
+     hidden until focused, which is the whole point — keyboard users get it,
+     nobody else has to look at it. */
+  .skip-link {
+    position: absolute;
+    left: var(--sn-space-5);
+    top: var(--sn-space-3);
+    padding: var(--sn-space-3) var(--sn-space-5);
+    background: var(--sn-ink);
+    color: var(--sn-on-ink);
+    border-radius: var(--sn-radius-md);
+    transform: translateY(-200%);
+    transition: transform var(--sn-duration-fast) var(--sn-ease-standard);
+  }
+  .skip-link:focus-visible {
+    transform: translateY(0);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    gap: var(--sn-space-8);
+    height: 68px;
+  }
+
+  .brand {
+    text-decoration: none;
+    flex: none;
+  }
+
+  nav {
+    flex: 1;
+  }
+
+  nav ul {
+    display: flex;
+    align-items: center;
+    gap: var(--sn-space-7);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  nav a {
+    color: var(--sn-text-muted);
+    text-decoration: none;
+    font-size: var(--sn-text-body-sm);
+    transition: color var(--sn-duration-fast) var(--sn-ease-standard);
+  }
+  nav a:hover,
+  nav a[aria-current='page'] {
+    color: var(--sn-text);
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: var(--sn-space-4);
+    flex: none;
+  }
+
+  /* Below the fold of a narrow viewport the nav and the secondary CTA are
+     noise; the wordmark and the primary action are what matter. A real
+     disclosure menu lands with the rest of the site pages. */
+  @media (max-width: 860px) {
+    nav,
+    .actions .btn-outline {
+      display: none;
+    }
+  }
+</style>

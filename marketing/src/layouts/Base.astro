@@ -1,0 +1,65 @@
+---
+import '@fontsource-variable/inter';
+import '@fontsource/ibm-plex-mono/400.css';
+import '../styles/global.css';
+
+import { BRAND } from '@sonari/brand';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  /** Page title, without the brand suffix — the layout appends it. */
+  title: string;
+  /** Meta description. Falls back to the brand description. */
+  description?: string;
+  /** Set false on pages that supply their own full-bleed chrome. */
+  chrome?: boolean;
+}
+
+const { title, description = BRAND.description, chrome = true } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? BRAND.siteUrl).href;
+const fullTitle = `${title} · ${BRAND.name}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={BRAND.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    {/*
+      Theme resolution runs before first paint so a reader who chose dark never
+      sees a light flash. Wrapped in try/catch because localStorage throws
+      outright in some privacy modes — a thrown error here would block the
+      whole document.
+    */}
+    <script is:inline>
+      try {
+        const stored = localStorage.getItem('sonari-theme');
+        if (stored === 'dark' || stored === 'light') {
+          document.documentElement.dataset.sonariTheme = stored;
+        }
+      } catch {
+        /* no stored preference available; prefers-color-scheme decides */
+      }
+    </script>
+  </head>
+  <body>
+    {chrome && <SiteHeader />}
+    <main id="main">
+      <slot />
+    </main>
+    {chrome && <SiteFooter />}
+  </body>
+</html>

@@ -1,0 +1,109 @@
+---
+import { BRAND, NAV } from '@sonari/brand';
+import Wordmark from './Wordmark.astro';
+
+const year = new Date().getFullYear();
+
+const columns = [
+  { heading: 'Product', items: NAV.product },
+  { heading: 'Resources', items: NAV.resources },
+  { heading: 'Legal', items: NAV.legal },
+];
+---
+
+<footer class="site-footer">
+  <hr class="hairline" />
+  <div class="page footer-inner">
+    <div class="footer-brand">
+      <Wordmark size={22} />
+      <p class="footer-tagline">{BRAND.tagline}</p>
+    </div>
+
+    {
+      columns.map((column) => (
+        <nav aria-label={column.heading}>
+          <p class="overline">{column.heading}</p>
+          <ul>
+            {column.items.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+  </div>
+
+  <div class="page footer-legal">
+    <p>© {year} {BRAND.legalName}</p>
+    {/*
+      AGPL-3.0 §5 requires the licence notice and upstream attribution to
+      survive on a modified network-served work. It is also simply correct:
+      the engine work this is built on is someone else's.
+    */}
+    <p>
+      Built on <a href={BRAND.upstream.url} rel="noopener">{BRAND.upstream.name}</a> ·
+      {BRAND.upstream.licence}
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--sn-space-11);
+    padding-bottom: var(--sn-space-9);
+  }
+
+  .footer-inner {
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr);
+    gap: var(--sn-space-8);
+    padding-block: var(--sn-space-9);
+  }
+
+  .footer-tagline {
+    margin: var(--sn-space-5) 0 0;
+    color: var(--sn-text-muted);
+    font-size: var(--sn-text-body-sm);
+    max-width: 28ch;
+  }
+
+  .site-footer ul {
+    list-style: none;
+    margin: var(--sn-space-5) 0 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sn-space-4);
+  }
+
+  .site-footer a {
+    color: var(--sn-text-muted);
+    text-decoration: none;
+    font-size: var(--sn-text-body-sm);
+  }
+  .site-footer a:hover {
+    color: var(--sn-text);
+  }
+
+  .footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sn-space-4);
+    color: var(--sn-text-subtle);
+    font-size: var(--sn-text-caption);
+  }
+  .footer-legal p {
+    margin: 0;
+  }
+  .footer-legal a {
+    color: var(--sn-text-muted);
+  }
+
+  @media (max-width: 860px) {
+    .footer-inner {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

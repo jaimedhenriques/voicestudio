@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Sonari">
+  <!-- Single-colour cut for app chrome, favicons, and anywhere the gradient
+       cannot survive (print, 16px tabs, monochrome tray icons). Inherits
+       currentColor so it recolours with the surrounding text. -->
+  <path
+    d="M23 9A5.35 5.35 0 1 0 16 16A5.35 5.35 0 1 0 9 23"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="3.6"
+    stroke-linecap="round"
+  />
+</svg>

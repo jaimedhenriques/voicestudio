@@ -1,0 +1,56 @@
+---
+import { BRAND } from '@sonari/brand';
+
+interface Props {
+  /** Rendered size in px for the mark; the wordmark scales with it. */
+  size?: number;
+  /** Hide the name, leaving just the glyph (compact headers, favicons-in-page). */
+  markOnly?: boolean;
+}
+
+const { size = 26, markOnly = false } = Astro.props;
+---
+
+{/*
+  The mark is an S traced by two point-symmetric ~224° arcs — the same
+  geometry as a sound wave radiating from a source, so the monogram and the
+  "emitting" reading are one line. Inlined rather than <img> so it inherits
+  currentColor and stays crisp at any size.
+
+  The wordmark is set in Inter at weight 300 with tight tracking rather than
+  being an outlined SVG: it is the same face and the same weight as the
+  display scale, so the logotype and the headlines are visibly one system.
+*/}
+<span class="wordmark" aria-label={BRAND.name} role="img">
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 32 32"
+    fill="none"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path
+      d="M23 9A5.35 5.35 0 1 0 16 16A5.35 5.35 0 1 0 9 23"
+      stroke="currentColor"
+      stroke-width="3.6"
+      stroke-linecap="round"
+    />
+  </svg>
+  {!markOnly && <span class="wordmark-text" style={`font-size:${size * 0.72}px`}>{BRAND.name}</span>}
+</span>
+
+<style>
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45em;
+    color: var(--sn-text);
+  }
+
+  .wordmark-text {
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+</style>

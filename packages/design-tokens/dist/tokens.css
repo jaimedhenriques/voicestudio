@@ -1,0 +1,243 @@
+/* GENERATED FILE — do not edit.
+ * Source: packages/design-tokens/src/tokens.ts
+ * Regenerate: bun run --cwd packages/design-tokens build
+ * Guarded by: packages/design-tokens/src/tokens.test.ts
+ */
+
+/* Light is the default: the marketing site is light-first. The app opts into
+ * dark explicitly via [data-sonari-theme="dark"], which its own
+ * [data-theme="sonari"] block sets alongside. Consumers that want to follow
+ * the OS instead get it from the prefers-color-scheme block below. */
+:root {
+  /* Neutral ramp */
+  --sn-neutral-0: #ffffff;
+  --sn-neutral-25: #fbfbfa;
+  --sn-neutral-50: #f7f7f6;
+  --sn-neutral-100: #efefed;
+  --sn-neutral-150: #e6e6e3;
+  --sn-neutral-200: #dcdcd8;
+  --sn-neutral-300: #c7c7c2;
+  --sn-neutral-400: #a3a39d;
+  --sn-neutral-500: #7c7c76;
+  --sn-neutral-600: #5a5a55;
+  --sn-neutral-700: #3d3d3a;
+  --sn-neutral-800: #2a2a28;
+  --sn-neutral-850: #1d1d1c;
+  --sn-neutral-900: #141416;
+  --sn-neutral-950: #0b0b0c;
+
+  /* Spectrum — atmosphere only, never a control surface */
+  --sn-spectrum-1: #1b1740;
+  --sn-spectrum-2: #3a3a95;
+  --sn-spectrum-3: #2f7f9b;
+  --sn-spectrum-4: #d99b4a;
+  --sn-spectrum-5: #f4e6c9;
+  --sn-spectrum-gradient: linear-gradient(135deg, #1b1740 0%, #3a3a95 32%, #2f7f9b 58%, #d99b4a 84%, #f4e6c9 100%);
+
+  /* Type */
+  --sn-font-sans: 'Inter Variable', Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --sn-font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --sn-font-serif: 'Source Serif 4 Variable', 'Source Serif 4', ui-serif, Georgia, serif;
+  --sn-text-display-mega: 4rem;
+  --sn-leading-display-mega: 1.05;
+  --sn-tracking-display-mega: -0.03em;
+  --sn-weight-display-mega: 300;
+  --sn-text-display-xl: 3rem;
+  --sn-leading-display-xl: 1.08;
+  --sn-tracking-display-xl: -0.025em;
+  --sn-weight-display-xl: 300;
+  --sn-text-display-lg: 2.25rem;
+  --sn-leading-display-lg: 1.15;
+  --sn-tracking-display-lg: -0.02em;
+  --sn-weight-display-lg: 300;
+  --sn-text-display-md: 1.875rem;
+  --sn-leading-display-md: 1.2;
+  --sn-tracking-display-md: -0.015em;
+  --sn-weight-display-md: 300;
+  --sn-text-display-sm: 1.5rem;
+  --sn-leading-display-sm: 1.25;
+  --sn-tracking-display-sm: -0.01em;
+  --sn-weight-display-sm: 300;
+  --sn-text-title-lg: 1.25rem;
+  --sn-leading-title-lg: 1.35;
+  --sn-tracking-title-lg: 0;
+  --sn-weight-title-lg: 500;
+  --sn-text-title-md: 1.125rem;
+  --sn-leading-title-md: 1.4;
+  --sn-tracking-title-md: 0;
+  --sn-weight-title-md: 500;
+  --sn-text-title-sm: 1rem;
+  --sn-leading-title-sm: 1.45;
+  --sn-tracking-title-sm: 0;
+  --sn-weight-title-sm: 600;
+  --sn-text-body-lg: 1.0625rem;
+  --sn-leading-body-lg: 1.55;
+  --sn-tracking-body-lg: 0.01em;
+  --sn-weight-body-lg: 400;
+  --sn-text-body: 0.9375rem;
+  --sn-leading-body: 1.55;
+  --sn-tracking-body: 0.01em;
+  --sn-weight-body: 400;
+  --sn-text-body-sm: 0.875rem;
+  --sn-leading-body-sm: 1.5;
+  --sn-tracking-body-sm: 0.01em;
+  --sn-weight-body-sm: 400;
+  --sn-text-caption: 0.8125rem;
+  --sn-leading-caption: 1.45;
+  --sn-tracking-caption: 0;
+  --sn-weight-caption: 400;
+  --sn-text-overline: 0.6875rem;
+  --sn-leading-overline: 1.4;
+  --sn-tracking-overline: 0.08em;
+  --sn-weight-overline: 600;
+  --sn-text-button: 0.875rem;
+  --sn-leading-button: 1;
+  --sn-tracking-button: 0;
+  --sn-weight-button: 500;
+
+  /* Space */
+  --sn-space-0: 0px;
+  --sn-space-1: 2px;
+  --sn-space-2: 4px;
+  --sn-space-3: 8px;
+  --sn-space-4: 12px;
+  --sn-space-5: 16px;
+  --sn-space-6: 20px;
+  --sn-space-7: 24px;
+  --sn-space-8: 32px;
+  --sn-space-9: 48px;
+  --sn-space-10: 64px;
+  --sn-space-11: 96px;
+  --sn-space-12: 128px;
+
+  /* Radius */
+  --sn-radius-none: 0px;
+  --sn-radius-xs: 4px;
+  --sn-radius-sm: 6px;
+  --sn-radius-md: 8px;
+  --sn-radius-lg: 12px;
+  --sn-radius-xl: 16px;
+  --sn-radius-2xl: 24px;
+  --sn-radius-pill: 999px;
+
+  /* Elevation */
+  --sn-shadow-none: none;
+  --sn-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(0, 0, 0, 0.04);
+  --sn-shadow-raised: 0 8px 32px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
+
+  /* Motion */
+  --sn-duration-instant: 80ms;
+  --sn-duration-fast: 140ms;
+  --sn-duration-base: 220ms;
+  --sn-duration-slow: 400ms;
+  --sn-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --sn-ease-entrance: cubic-bezier(0, 0, 0, 1);
+  --sn-ease-exit: cubic-bezier(0.3, 0, 1, 1);
+
+  /* Layout */
+  --sn-measure-prose: 68ch;
+  --sn-measure-narrow: 48ch;
+  --sn-page-max: 1200px;
+  --sn-page-gutter: 24px;
+
+  /* Theme: light */
+  --sn-bg: #f7f7f6;
+  --sn-bg-elev-1: #ffffff;
+  --sn-bg-elev-2: #fbfbfa;
+  --sn-bg-elev-3: #efefed;
+  --sn-bg-inset: #efefed;
+  --sn-text: #18181a;
+  --sn-text-muted: #7c7c76;
+  --sn-text-subtle: #a3a39d;
+  --sn-text-inverse: #ffffff;
+  --sn-border: #e6e6e3;
+  --sn-border-strong: #c7c7c2;
+  --sn-ink: #18181a;
+  --sn-ink-hover: #000000;
+  --sn-on-ink: #ffffff;
+  --sn-accent: #3a3a95;
+  --sn-accent-hover: #2c2c78;
+  --sn-accent-soft: rgba(58, 58, 149, 0.08);
+  --sn-success: #157f4e;
+  --sn-warning: #9a6510;
+  --sn-danger: #b3372c;
+  --sn-shadow-color: 0deg 0% 0%;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-sonari-theme='light']) {
+    --sn-bg: #0b0b0c;
+    --sn-bg-elev-1: #141416;
+    --sn-bg-elev-2: #1d1d1c;
+    --sn-bg-elev-3: #242422;
+    --sn-bg-inset: #08080a;
+    --sn-text: #f2f2f0;
+    --sn-text-muted: #9a9a94;
+    --sn-text-subtle: #6e6e69;
+    --sn-text-inverse: #0b0b0c;
+    --sn-border: rgba(242, 242, 240, 0.10);
+    --sn-border-strong: rgba(242, 242, 240, 0.18);
+    --sn-ink: #f2f2f0;
+    --sn-ink-hover: #ffffff;
+    --sn-on-ink: #0b0b0c;
+    --sn-accent: #8f8ef0;
+    --sn-accent-hover: #a5a4f4;
+    --sn-accent-soft: rgba(143, 142, 240, 0.14);
+    --sn-success: #4ec98a;
+    --sn-warning: #e0a84a;
+    --sn-danger: #f0837a;
+    --sn-shadow-color: 0deg 0% 0%;
+    color-scheme: dark;
+  }
+}
+
+:root[data-sonari-theme='dark'] {
+  --sn-bg: #0b0b0c;
+  --sn-bg-elev-1: #141416;
+  --sn-bg-elev-2: #1d1d1c;
+  --sn-bg-elev-3: #242422;
+  --sn-bg-inset: #08080a;
+  --sn-text: #f2f2f0;
+  --sn-text-muted: #9a9a94;
+  --sn-text-subtle: #6e6e69;
+  --sn-text-inverse: #0b0b0c;
+  --sn-border: rgba(242, 242, 240, 0.10);
+  --sn-border-strong: rgba(242, 242, 240, 0.18);
+  --sn-ink: #f2f2f0;
+  --sn-ink-hover: #ffffff;
+  --sn-on-ink: #0b0b0c;
+  --sn-accent: #8f8ef0;
+  --sn-accent-hover: #a5a4f4;
+  --sn-accent-soft: rgba(143, 142, 240, 0.14);
+  --sn-success: #4ec98a;
+  --sn-warning: #e0a84a;
+  --sn-danger: #f0837a;
+  --sn-shadow-color: 0deg 0% 0%;
+  color-scheme: dark;
+}
+
+:root[data-sonari-theme='light'] {
+  --sn-bg: #f7f7f6;
+  --sn-bg-elev-1: #ffffff;
+  --sn-bg-elev-2: #fbfbfa;
+  --sn-bg-elev-3: #efefed;
+  --sn-bg-inset: #efefed;
+  --sn-text: #18181a;
+  --sn-text-muted: #7c7c76;
+  --sn-text-subtle: #a3a39d;
+  --sn-text-inverse: #ffffff;
+  --sn-border: #e6e6e3;
+  --sn-border-strong: #c7c7c2;
+  --sn-ink: #18181a;
+  --sn-ink-hover: #000000;
+  --sn-on-ink: #ffffff;
+  --sn-accent: #3a3a95;
+  --sn-accent-hover: #2c2c78;
+  --sn-accent-soft: rgba(58, 58, 149, 0.08);
+  --sn-success: #157f4e;
+  --sn-warning: #9a6510;
+  --sn-danger: #b3372c;
+  --sn-shadow-color: 0deg 0% 0%;
+  color-scheme: light;
+}
