@@ -1,0 +1,212 @@
+/* Sonari marketing site — global styles.
+ *
+ * The token layer is the SHARED one from packages/design-tokens: the site and
+ * the studio app read the same file, so the brand cannot drift between them.
+ * Everything below is layout and component styling that is specific to the
+ * site; no colour, size, or timing literal belongs here — reach for a
+ * --sn-* token instead.
+ */
+
+@import 'tailwindcss';
+@import '@sonari/design-tokens/tokens.css';
+
+/* Bridge the shared tokens into Tailwind v4's theme so utility classes and
+ * hand-written CSS resolve to the same values. */
+@theme inline {
+  --color-bg: var(--sn-bg);
+  --color-surface: var(--sn-bg-elev-1);
+  --color-surface-soft: var(--sn-bg-elev-2);
+  --color-inset: var(--sn-bg-inset);
+  --color-text: var(--sn-text);
+  --color-text-muted: var(--sn-text-muted);
+  --color-text-subtle: var(--sn-text-subtle);
+  --color-ink: var(--sn-ink);
+  --color-on-ink: var(--sn-on-ink);
+  --color-accent: var(--sn-accent);
+  --color-line: var(--sn-border);
+  --color-line-strong: var(--sn-border-strong);
+
+  --font-sans: var(--sn-font-sans);
+  --font-mono: var(--sn-font-mono);
+
+  --radius-pill: var(--sn-radius-pill);
+}
+
+html {
+  background: var(--sn-bg);
+  color: var(--sn-text);
+  font-family: var(--sn-font-sans);
+  /* Editorial body setting: positive tracking, generous leading. */
+  font-size: var(--sn-text-body);
+  line-height: var(--sn-leading-body);
+  letter-spacing: var(--sn-tracking-body);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+}
+
+/* ── Type ─────────────────────────────────────────────────────────────
+   Display runs at weight 300 with negative tracking. That single decision
+   is what separates this register from generic-SaaS; do not "fix" a
+   heading by bolding it. */
+
+.display-mega,
+.display-xl,
+.display-lg,
+.display-md,
+.display-sm {
+  font-weight: 300;
+  margin: 0;
+  text-wrap: balance;
+}
+
+.display-mega {
+  font-size: clamp(2.5rem, 1.6rem + 4.5vw, var(--sn-text-display-mega));
+  line-height: var(--sn-leading-display-mega);
+  letter-spacing: var(--sn-tracking-display-mega);
+}
+.display-xl {
+  font-size: clamp(2rem, 1.4rem + 3vw, var(--sn-text-display-xl));
+  line-height: var(--sn-leading-display-xl);
+  letter-spacing: var(--sn-tracking-display-xl);
+}
+.display-lg {
+  font-size: clamp(1.75rem, 1.3rem + 2vw, var(--sn-text-display-lg));
+  line-height: var(--sn-leading-display-lg);
+  letter-spacing: var(--sn-tracking-display-lg);
+}
+.display-md {
+  font-size: var(--sn-text-display-md);
+  line-height: var(--sn-leading-display-md);
+  letter-spacing: var(--sn-tracking-display-md);
+}
+.display-sm {
+  font-size: var(--sn-text-display-sm);
+  line-height: var(--sn-leading-display-sm);
+  letter-spacing: var(--sn-tracking-display-sm);
+}
+
+.overline {
+  font-size: var(--sn-text-overline);
+  line-height: var(--sn-leading-overline);
+  letter-spacing: var(--sn-tracking-overline);
+  font-weight: var(--sn-weight-overline);
+  text-transform: uppercase;
+  color: var(--sn-text-muted);
+  margin: 0;
+}
+
+.lede {
+  font-size: var(--sn-text-body-lg);
+  line-height: var(--sn-leading-body-lg);
+  letter-spacing: var(--sn-tracking-body-lg);
+  color: var(--sn-text-muted);
+  max-width: var(--sn-measure-prose);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* ── Layout ───────────────────────────────────────────────────────────── */
+
+.page {
+  width: 100%;
+  max-width: var(--sn-page-max);
+  margin-inline: auto;
+  padding-inline: var(--sn-page-gutter);
+}
+
+.section {
+  padding-block: clamp(var(--sn-space-9), 6vw, var(--sn-space-11));
+}
+
+/* ── Controls ─────────────────────────────────────────────────────────
+   Ink is the only CTA fill in the system. There is deliberately no
+   "primary blue" button: colour is reserved for atmosphere and for
+   status. */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sn-space-3);
+  height: 40px;
+  padding-inline: var(--sn-space-6);
+  border-radius: var(--sn-radius-pill);
+  border: 1px solid transparent;
+  font-size: var(--sn-text-button);
+  font-weight: var(--sn-weight-button);
+  line-height: var(--sn-leading-button);
+  text-decoration: none;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background-color var(--sn-duration-fast) var(--sn-ease-standard),
+    border-color var(--sn-duration-fast) var(--sn-ease-standard),
+    color var(--sn-duration-fast) var(--sn-ease-standard);
+}
+
+.btn-primary {
+  background: var(--sn-ink);
+  color: var(--sn-on-ink);
+}
+.btn-primary:hover {
+  background: var(--sn-ink-hover);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--sn-text);
+  border-color: var(--sn-border-strong);
+}
+.btn-outline:hover {
+  border-color: var(--sn-text);
+}
+
+/* One visible focus treatment for every interactive element. Never remove
+ * it — :focus-visible only fires for keyboard and AT users, who are exactly
+ * the people it exists for. */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--sn-accent);
+  outline-offset: 2px;
+  border-radius: var(--sn-radius-xs);
+}
+
+/* ── Surfaces ─────────────────────────────────────────────────────────── */
+
+.card {
+  background: var(--sn-bg-elev-1);
+  border: 1px solid var(--sn-border);
+  border-radius: var(--sn-radius-xl);
+  padding: var(--sn-space-7);
+}
+
+.hairline {
+  border: 0;
+  border-top: 1px solid var(--sn-border);
+  margin: 0;
+}
+
+/* The one place saturated colour is allowed: an atmospheric field, never an
+ * actionable surface. Kept behind content at low opacity so text contrast is
+ * unaffected. */
+.spectrum-field {
+  background: var(--sn-spectrum-gradient);
+}

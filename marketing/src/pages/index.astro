@@ -1,0 +1,141 @@
+---
+import { BRAND } from '@sonari/brand';
+import Base from '../layouts/Base.astro';
+
+// Copy is deliberately concrete and unhyped. Numbers are the ones the product
+// actually ships (see docs/features.yaml, README.md) — if an engine count
+// changes, this changes with it rather than rounding up.
+const capabilities = [
+  {
+    overline: 'Agents',
+    title: 'Agents that hold a conversation',
+    body: 'Give an agent a voice, a brief, and a phone number. It listens, thinks, and answers — and stops talking the moment someone interrupts it.',
+    href: '/agents',
+  },
+  {
+    overline: 'Voices',
+    title: 'A voice from a few seconds of audio',
+    body: 'Clone from a short reference clip, or design one from scratch by age, accent, and delivery. 16 synthesis engines, one interface.',
+    href: '/voices',
+  },
+  {
+    overline: 'Dubbing',
+    title: 'Video, in someone else’s language',
+    body: 'Transcribe, translate, and re-voice a video while keeping the original speaker’s timing and delivery. 646 languages in the catalogue.',
+    href: '/dubbing',
+  },
+];
+---
+
+<Base title="Voice models and voice agents" description={BRAND.description}>
+  <section class="hero">
+    {/*
+      The spectral field is atmosphere, not a control. It sits behind the
+      content at low opacity and is aria-hidden — it carries no information a
+      screen-reader user would be missing.
+    */}
+    <div class="hero-field spectrum-field" aria-hidden="true"></div>
+
+    <div class="page hero-inner">
+      <p class="overline">Voice AI</p>
+      <h1 class="display-mega">{BRAND.tagline}</h1>
+      <p class="lede">{BRAND.description}</p>
+
+      <div class="hero-actions">
+        <a class="btn btn-primary" href={BRAND.appUrl}>Open the studio</a>
+        <a class="btn btn-outline" href="/download">Download for desktop</a>
+      </div>
+
+      <p class="hero-note">
+        The desktop app runs entirely on your machine — no account, no API key, no usage meter.
+      </p>
+    </div>
+  </section>
+
+  <section class="section page">
+    <div class="capabilities">
+      {
+        capabilities.map((item) => (
+          <a class="card capability" href={item.href}>
+            <p class="overline">{item.overline}</p>
+            <h2 class="display-sm">{item.title}</h2>
+            <p class="capability-body">{item.body}</p>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding-block: clamp(var(--sn-space-10), 9vw, var(--sn-space-12));
+  }
+
+  .hero-field {
+    position: absolute;
+    inset: -40% -10% auto -10%;
+    height: 120%;
+    z-index: -1;
+    opacity: 0.1;
+    /* Fades to nothing well before the text baseline, so body contrast is
+       decided by --sn-bg alone and never by the gradient underneath it. */
+    mask-image: radial-gradient(60% 60% at 50% 0%, #000 0%, transparent 72%);
+    filter: blur(40px);
+  }
+
+  .hero-inner {
+    display: grid;
+    gap: var(--sn-space-7);
+    justify-items: start;
+  }
+
+  .hero-inner .display-mega {
+    max-width: 16ch;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sn-space-4);
+    margin-top: var(--sn-space-3);
+  }
+
+  .hero-note {
+    margin: 0;
+    color: var(--sn-text-subtle);
+    font-size: var(--sn-text-caption);
+    max-width: var(--sn-measure-narrow);
+  }
+
+  .capabilities {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--sn-space-5);
+  }
+
+  .capability {
+    display: grid;
+    gap: var(--sn-space-4);
+    align-content: start;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      border-color var(--sn-duration-base) var(--sn-ease-standard),
+      transform var(--sn-duration-base) var(--sn-ease-standard);
+  }
+  .capability:hover {
+    border-color: var(--sn-border-strong);
+    transform: translateY(-2px);
+  }
+
+  .capability-body {
+    margin: 0;
+    color: var(--sn-text-muted);
+    font-size: var(--sn-text-body-sm);
+    line-height: var(--sn-leading-body-sm);
+  }
+</style>

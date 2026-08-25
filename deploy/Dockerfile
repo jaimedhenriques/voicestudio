@@ -14,12 +14,27 @@ WORKDIR /app
 
 # Monorepo — bun workspace with lockfile at repo root. Copy manifests first
 # so `bun install` caches independently of source edits.
+#
+# EVERY workspace member's package.json must be present before
+# `--frozen-lockfile` runs: bun resolves the whole workspace graph from the
+# root lockfile, and a member it cannot see is a hard failure
+# (`Workspace not found "<name>"`), not a skip. ci.yml runs the same flag but
+# from a full checkout where every manifest already exists on disk, so a
+# missing COPY here is green in CI and red only in Docker. Add a line whenever
+# a workspace joins the root package.json "workspaces" array — guarded by
+# tests/test_docker_workspace_manifests.py.
 COPY package.json bun.lock ./
 COPY frontend/package.json ./frontend/
+COPY packages/design-tokens/package.json ./packages/design-tokens/
+COPY packages/brand/package.json ./packages/brand/
+COPY marketing/package.json ./marketing/
 
 RUN bun install --frozen-lockfile
 
-# Build static files (output lands in /app/frontend/dist)
+# Build static files (output lands in /app/frontend/dist). Only the app is
+# built here — the marketing site deploys separately and has no place in the
+# runtime image.
+COPY packages/ ./packages/
 COPY frontend/ ./frontend/
 RUN bun run --cwd frontend build
 

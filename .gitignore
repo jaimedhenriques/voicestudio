@@ -14,10 +14,20 @@ __pycache__/
 dist/
 build/
 
+# packages/design-tokens/dist/tokens.css is a COMMITTED generated artifact —
+# the app's index.css and the marketing site both @import it directly, with no
+# build step, so it has to exist in a fresh checkout and in the Docker build
+# context. The blanket `dist/` above would swallow it. Drift from
+# src/tokens.ts is caught by packages/design-tokens/src/tokens.test.ts, so
+# committing it cannot rot into hand-editing it.
+!packages/design-tokens/dist/
+!packages/design-tokens/dist/tokens.css
+
 # ─────────────────────────────────────────────────────────────────────────
 #  Node / Turborepo / Tauri
 # ─────────────────────────────────────────────────────────────────────────
 node_modules/
+.astro/
 node_modules
 .turbo/
 bun.lockb
