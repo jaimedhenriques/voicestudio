@@ -1,4 +1,4 @@
-# Agent Rules — VoiceStudio
+# Agent Rules — Sonari (fork of VoiceStudio)
 
 Binding for every AI agent (Claude, Codex, Cursor, review bots, …). CLAUDE.md is the full constitution; this is the operating contract. When they conflict, CLAUDE.md wins.
 
@@ -26,7 +26,8 @@ Binding for every AI agent (Claude, Codex, Cursor, review bots, …). CLAUDE.md 
 ## Change rules (see CLAUDE.md for full text)
 - Root-cause the class, not the instance; fail-before/pass-after regression test; smallest correct change.
 - Default behavior identical on macOS/Windows/Linux; platform-only features go behind explicit opt-in. Divergent default = P0.
-- Local-first: no new required network calls; any HF download gated on installed-ness or explicit user action; all synthetic audio through the `mark_synthetic` chokepoint.
+- Desktop stays local-first: no new required network calls on the desktop path; any HF download gated on installed-ness or explicit user action; all synthetic audio through the `mark_synthetic` chokepoint. Hosted-platform seams (accounts, `tenant_id`, control-plane calls, metering) are additive and flag-gated **off** — they may never sit on the path of a desktop clone, dub, dictation, or generation.
+- Telephony guardrails are non-negotiable: disclosure preamble, consent-locked profile, always-on watermark, allowlist + daily cap + no bulk dial, immutable call log, jurisdiction docs. We hold the carrier account, so the liability is ours. Never weaken one to ship a feature.
 - Every user-facing string via i18n, present in ALL 21 `frontend/src/i18n/locales/*.json` with real translations.
 - Docs-sync in the same PR. CHANGELOG Unreleased: quiet one-liners ending `(#N)` + `— thanks @user!` for community work, under a short `**Highlights**` list.
 - Versioning: `frontend/package.json` is the single source of truth; never bump without the owner asking.
@@ -35,13 +36,21 @@ Binding for every AI agent (Claude, Codex, Cursor, review bots, …). CLAUDE.md 
 
 ## Agent skills
 
-Project development skills are pinned in `skills-lock.json` and installed under
-`.agents/skills/`: Vite and FastAPI.
-Repository rules and tracker mappings override generic skill guidance.
+Project skills are pinned in `skills-lock.json` and installed under `.agents/skills/`.
+Engineering: `vite`, `fastapi-python`. Design: `design-taste-frontend`, `minimalist-ui`,
+`high-end-visual-design`, `redesign-existing-projects`, `image-to-code`, `brandkit`,
+`web-design-guidelines`.
+
+Repository rules and tracker mappings override generic skill guidance — and so does the
+codebase. The design skills carry blanket bans (e.g. on Inter and on Lucide icons) that
+this repo deliberately does not follow: Inter Variable ships a real weight-300 master and
+is already self-hosted, which is exactly what the display scale needs, and Lucide is the
+icon library across ~110 components (`frontend/components.json`). Take the skills'
+*principles*, not their vendor preferences.
 
 ### Issue tracker
 
-GitHub Issues on `debpalash/VoiceStudio`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+GitHub Issues on `jaimedhenriques/voicestudio` (this fork). Use the `gh` CLI locally, or the GitHub MCP tools (`mcp__github__*`) in remote sessions where `gh` is not installed. See `docs/agents/issue-tracker.md`. Upstream issues live on `debpalash/VoiceStudio`; file there only for bugs that reproduce on unmodified upstream.
 
 ### Triage labels
 

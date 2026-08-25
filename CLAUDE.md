@@ -1,13 +1,29 @@
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
 
-**VoiceStudio**
+**Sonari** — a fork of [VoiceStudio](https://github.com/debpalash/VoiceStudio) (AGPL-3.0-only).
 
-VoiceStudio is an open-source, fully-local ElevenLabs alternative — a desktop app for voice cloning, voice design, video dubbing, and real-time dictation across 646 languages. It runs entirely on the user's machine (CUDA/MPS/ROCm/CPU auto-detect), with no API keys, no accounts, and no cloud dependencies. It's an active beta with a growing user base who hit it with real workloads (50-video batches, multi-engine setups, edge-OS platforms) and report friction in GitHub Issues and Discord. The current version lives in `frontend/package.json` (the single source of truth — see Versioning); the latest stable tag is on the [Releases page](https://github.com/debpalash/VoiceStudio/releases/latest). With `AUTO_VERSION_BUMP` off (the current owner setting), `main` holds at the released version between releases.
+> **Working name.** `Sonari` is provisional pending domain and trademark clearance, and lives in exactly one constant (`packages/brand`). Neither has been verified. Do not print it on anything irreversible until they are.
 
-**Core Value:** **A first-run that actually works.** A user who downloads the installer (or clones the repo) should reach a working voice-cloning or dubbing output without hitting a wall — and when something does go wrong, the error or docs should tell them exactly what to do.
+Sonari is a voice-AI platform in two halves that share one codebase:
+
+1. **The desktop app** — voice cloning, voice design, video dubbing, and real-time dictation across 646 languages, running entirely on the user's machine (CUDA/MPS/ROCm/CPU auto-detect). Free, no account, no API key, no usage meter. This is the upstream product and it stays that way.
+2. **The hosted platform** — the same engines behind accounts, workspaces, quotas, a customer-facing API, and **voice agents that hold a real conversation and place phone calls**. Opt-in and additive; the desktop app never depends on it.
+
+Agents are the wedge, not the studio tools. Cloning and dubbing are table stakes in this market; an agent you can give a voice, a brief, and a phone number is what people pay for.
+
+**Core Value:** **A first-run that actually works** — on both halves. Someone who downloads the installer reaches a working clone or dub without hitting a wall. Someone who signs up reaches an agent that answers the phone. When something goes wrong, the error or the docs say exactly what to do.
 
 Everything else (new engines, fancy features) is downstream of "the thing installs and runs reliably across platforms, with the engines and pipelines users already depend on staying compatible."
+
+### Fork divergence
+
+This fork changes the product's shape. Where upstream's rules still serve us they are kept verbatim below; where they described a product we are no longer only building, they are replaced. Rules kept unchanged, because they are good engineering and CI enforces them: **version lockstep, docs-sync, changelog quality, localization, backward-compatible project data, cross-platform parity, fix quality, keep-main-green.**
+
+Two obligations the fork takes on, which are not upstream's problem:
+
+- **AGPL-3.0 §13.** Running modified AGPL code as a network service obliges us to offer the corresponding source to the users of that service. That is workable for a SaaS (Grafana and Mattermost both do it) but it is a standing obligation, not a footnote: platform code lives in this repo, and `/legal/licence` on the marketing site carries the offer. Upstream attribution stays in the README, the footer, and `LICENSE-NOTICE.md`.
+- **We are the carrier of record.** Platform-managed phone numbers make us the reseller, not the user. See the telephony constraint below.
 
 ### Constraints
 
@@ -15,8 +31,10 @@ Everything else (new engines, fancy features) is downstream of "the thing instal
 - **Cross-platform parity**: Every fix must work on macOS (Apple Silicon + Intel), Windows (x64), and Linux (AppImage + deb). No platform-only regressions; the cross-platform bug bash (PR #51) is the baseline.
 - **Default features must work on every platform (strict rule, 2026-05-20):** A feature that ships in default mode — out-of-the-box, no user customization, no opt-in toggle — must behave identically on macOS, Windows, and Linux. Platform-specific *implementation code* is allowed for OS APIs / shells / packaging, but the user-visible *default behavior* cannot diverge. Platform-only features (e.g., a macOS-only global shortcut, a Windows-only path picker) must go behind explicit user opt-in: Settings toggle, env var, or CLI flag. When a default doesn't work on a platform, that's a P0 bug — either fix it on the missing platform or move it behind opt-in. No third option. **This rule governs BEHAVIOUR, not PERFORMANCE** (clarified 2026-07-30, council): hardware acceleration is expected to vary by host — CUDA, MPS, DirectML, Triton availability and `torch.compile` are all host-dependent by design, and reading the rule to forbid that would forbid GPU support itself. An optimization that is skipped where it cannot work (missing Triton, an arch the wheel lacks, a path its toolchain cannot link) is NOT a parity violation; a *feature* the user can see and use on one OS but not another is.
 - **Backward-compatible project data**: Existing `omnivoice_data/` (user voices, projects, settings) must keep working without manual migration. Any DB schema change goes through alembic with a tested upgrade path.
-- **Local-first guarantee preserved**: nothing leaves the machine without the user's **explicit yes**, and the app must remain fully functional with everything declined. Auto bug reporting is opt-in and submits only to GitHub Issues (prefilled-URL, from the user's own browser). Product analytics (owner-sanctioned 2026-07-16) is opt-in PostHog EU with a **first-run consent prompt** — two equal-weight Yes/No buttons, never default-on, skipping = off; consent-gated, allowlisted content-free metadata only (`backend/core/analytics.py`); every build — installer, Docker, and source alike (owner reversal 2026-07-20, #1193) — carries the in-repo publishable write-only token and shows the same consent ask, with env/baked token overriding it. No required cloud calls, accounts, or API keys.
-- **Beta release cadence (no RC, no ceremony — strict rule, 2026-05-20):** the v0.3.x line has **no release candidates, no 48h soak, no formal release ceremony**. Every fix goes continuous-to-main; the owner tags a patch (`v0.3.Z`) from main whenever the current state is worth cutting. No `-rc` tags. No phased release. No `v0.4` deferrals while the v0.3.x line is open — every open issue and every open community PR gets absorbed into the v0.3.x line or explicitly declined. Users follow `main` for previews; users wanting stable stay on the latest tagged release. ROADMAP.md's Phase 6 "Release/Verify/Retro" entries are obsolete unless the user revives them.
+- **The desktop app stays local-first (replaces upstream's blanket local-first guarantee):** on the desktop build, nothing leaves the machine without the user's **explicit yes**, and the app stays fully functional with everything declined — no required cloud calls, accounts, or API keys. This is not sentiment: it is the top of the funnel, and it is what AGPL compliance looks like in practice. Auto bug reporting stays opt-in via prefilled GitHub-issue URLs from the user's own browser. Product analytics stays opt-in PostHog EU behind a first-run consent prompt — two equal-weight Yes/No buttons, never default-on, skipping = off; consent-gated, allowlisted content-free metadata only (`backend/core/analytics.py`); every build carries the in-repo publishable write-only token, env/baked token overriding (`tests/test_no_committed_analytics_token.py` allows it in exactly `backend/core/analytics.py` + `frontend/src/utils/analytics.ts`).
+  **Hosted-platform features are additive and must never become desktop dependencies.** Concretely: an account, a `tenant_id`, a network call to the control plane, or a metering hook may never sit on the path of a desktop clone, dub, dictation, or generation. Every platform seam is flag-gated **off** by default, and the desktop test suites run with it off. When you can't tell whether something belongs to the app or the platform, it belongs to the platform.
+- **Telephony: we are the carrier of record.** Platform-managed numbers mean **we** hold the carrier account, so TCPA / FCC 24-17 exposure, 10DLC and STIR/SHAKEN registration, and ELVIS Act tool-provider liability land on us, not on the customer. Upstream's §R1 guardrails are therefore *stricter* here, not looser, and all six are non-negotiable in code: a non-removable spoken disclosure preamble synthesised server-side; a consent-locked (`verified_own_voice`) profile required; AudioSeal always on with no toggle; destination allowlist + per-tenant daily cap and **no bulk-dial endpoint, ever**; an immutable call log with a two-party-consent gate before recording; and an honest jurisdiction notice in `docs/telephony.md`. Add per-tenant KYC before any live carrier path is enabled. A guardrail may not be weakened to ship a feature. See `docs/specs/longform/32-phone-calls.md` (written for BYO-carrier — the gate inverts, the guardrails do not).
+- **Release cadence (replaces upstream's v0.3.x beta rule):** continuous-to-main, no release candidates, no soak windows, no ceremony. The desktop app tags from main when the current state is worth cutting; the hosted platform deploys from main. No `-rc` tags, no "defer to next version" labels — scope is absorbed or declined, never re-versioned. Upstream's `ROADMAP.md` Phase 6 entries remain obsolete.
 <!-- GSD:project-end -->
 
 <!-- GSD:stack-start source:research/STACK.md -->
@@ -109,7 +127,7 @@ Direct repo edits are authorized (owner decision, 2026-07-08). The GSD command g
 
 ### Issue tracker
 
-GitHub Issues on `debpalash/VoiceStudio`, via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+GitHub Issues on `jaimedhenriques/voicestudio` (this fork). Use the `gh` CLI locally, or the GitHub MCP tools (`mcp__github__*`) in remote sessions where `gh` is not installed. See `docs/agents/issue-tracker.md`. Upstream issues live on `debpalash/VoiceStudio`; file there only for bugs that reproduce on unmodified upstream.
 
 ### Triage labels
 
