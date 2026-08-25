@@ -1,0 +1,129 @@
+---
+import { BRAND } from '@sonari/brand';
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+
+// Honest state of play: the desktop app is real and free today; the hosted
+// tier is not open yet. No fake price points — a made-up number on a pricing
+// page is the fastest way to lose the person who was going to pay.
+const tiers = [
+  {
+    name: 'Desktop',
+    price: 'Free',
+    note: 'Available now',
+    body: 'The full studio, running on your own machine. No account, no API key, no usage meter. Open source under AGPL-3.0.',
+    points: [
+      'Voice cloning and voice design',
+      'Video dubbing across 646 languages',
+      'Dictation and long-form audiobooks',
+      'Runs on your GPU — CUDA, Metal, ROCm, or CPU',
+    ],
+    cta: { label: 'Download', href: '/download' },
+  },
+  {
+    name: 'Hosted',
+    price: 'Not open yet',
+    note: 'In development',
+    body: 'The same engines, run by us, with agents, an API, and workspaces for a team. Pricing will be published when there is something to buy.',
+    points: [
+      'Voice agents you can talk to',
+      'API access with usage-based pricing',
+      'Shared workspaces and voice libraries',
+      'Phone numbers — pending carrier setup',
+    ],
+    cta: { label: 'Read about agents', href: '/agents' },
+  },
+];
+---
+
+<Base
+  title="Pricing"
+  description="The desktop app is free and open source. The hosted tier is in development; pricing follows when there is something to buy."
+>
+  <PageHeader
+    overline="Pricing"
+    title="Free on your machine. Hosted when it is ready."
+    lede="The desktop app is finished software and costs nothing. The hosted platform is being built in the open — there is no price here yet because there is nothing to sell yet."
+  />
+
+  <section class="section page">
+    <div class="tiers">
+      {tiers.map((tier) => (
+        <article class="card tier">
+          <p class="overline">{tier.note}</p>
+          <h2 class="display-md">{tier.name}</h2>
+          <p class="price">{tier.price}</p>
+          <p class="tier-body">{tier.body}</p>
+          <ul>
+            {tier.points.map((point) => <li>{point}</li>)}
+          </ul>
+          <a class="btn btn-outline" href={tier.cta.href}>{tier.cta.label}</a>
+        </article>
+      ))}
+    </div>
+
+    <p class="note">
+      {BRAND.name} is a fork of an open-source project and stays open source. Running modified
+      AGPL code as a hosted service obliges us to offer its source to the people using it — see
+      <a href="/legal/licence">the licence page</a>.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .tiers {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--sn-space-5);
+    align-items: start;
+  }
+
+  .tier {
+    display: grid;
+    gap: var(--sn-space-4);
+    justify-items: start;
+  }
+
+  .price {
+    margin: 0;
+    font-size: var(--sn-text-title-lg);
+    font-weight: var(--sn-weight-title-lg);
+  }
+
+  .tier-body {
+    margin: 0;
+    color: var(--sn-text-muted);
+    font-size: var(--sn-text-body-sm);
+  }
+
+  .tier ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: var(--sn-space-3);
+    color: var(--sn-text-muted);
+    font-size: var(--sn-text-body-sm);
+  }
+
+  .tier li::before {
+    content: '—';
+    color: var(--sn-text-subtle);
+    margin-right: var(--sn-space-3);
+  }
+
+  .tier .btn {
+    margin-top: var(--sn-space-3);
+  }
+
+  .note {
+    margin-top: var(--sn-space-8);
+    color: var(--sn-text-subtle);
+    font-size: var(--sn-text-body-sm);
+    max-width: var(--sn-measure-prose);
+  }
+
+  .note a {
+    color: var(--sn-text-muted);
+  }
+</style>

@@ -7092,6 +7092,9 @@ button.dub-stepper__action:focus-visible {
   margin: 0;
   font-size: var(--text-base);
   line-height: 1.5;
+  /* Model output is arbitrary text — a long URL or an unbroken token would
+     otherwise widen the panel and push the layout sideways. */
+  overflow-wrap: anywhere;
 }
 
 .agents-line.is-user {

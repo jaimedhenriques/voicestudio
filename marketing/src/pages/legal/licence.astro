@@ -1,0 +1,84 @@
+---
+import { BRAND } from '@sonari/brand';
+import Base from '../../layouts/Base.astro';
+import PageHeader from '../../components/PageHeader.astro';
+---
+
+<Base
+  title="Licence and source"
+  description="Sonari is AGPL-3.0. Running it as a hosted service obliges us to offer the corresponding source — here is where to get it."
+>
+  <PageHeader
+    overline="Legal"
+    title="Licence and source"
+    lede="Section 13 of the AGPL says that if you run modified AGPL software as a network service, the people using that service are entitled to its source. This page is how we meet that."
+  />
+
+  <section class="section page prose">
+    <h2 class="display-sm">The offer</h2>
+    <p>
+      The complete corresponding source for {BRAND.name} — the desktop app and everything behind
+      the hosted service — is published at
+      <a href={BRAND.upstream.url}>our repository</a>, under
+      {BRAND.upstream.licence}. It is the same code that runs in production; there is no separate
+      closed build.
+    </p>
+
+    <h2 class="display-sm">Upstream</h2>
+    <p>
+      {BRAND.name} is a fork of <a href={BRAND.upstream.url}>{BRAND.upstream.name}</a>, which is
+      itself {BRAND.upstream.licence}. The engine work, the dubbing pipeline, and most of what
+      makes the studio good came from that project and its contributors. The licence requires the
+      attribution; keeping it prominent is simply correct.
+    </p>
+
+    <h2 class="display-sm">What this means for you</h2>
+    <ul>
+      <li>You can read, modify, and self-host the whole thing.</li>
+      <li>The desktop app costs nothing and needs no account.</li>
+      <li>If you run a modified copy as a service, the same obligation applies to you.</li>
+    </ul>
+
+    <p class="note">
+      This page is a description of our obligations, not legal advice. The licence text itself is
+      the authority.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .prose {
+    max-width: var(--sn-measure-prose);
+  }
+
+  .prose h2 {
+    margin: var(--sn-space-8) 0 var(--sn-space-4);
+  }
+
+  .prose h2:first-child {
+    margin-top: 0;
+  }
+
+  .prose p,
+  .prose li {
+    color: var(--sn-text-muted);
+  }
+
+  .prose ul {
+    display: grid;
+    gap: var(--sn-space-3);
+    padding-left: var(--sn-space-6);
+  }
+
+  .prose a {
+    color: var(--sn-text);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .note {
+    margin-top: var(--sn-space-8);
+    color: var(--sn-text-subtle);
+    font-size: var(--sn-text-body-sm);
+  }
+</style>

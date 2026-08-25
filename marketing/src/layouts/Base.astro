@@ -30,6 +30,10 @@ const fullTitle = `${title} · ${BRAND.name}`;
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {/* Matches --sn-bg in each scheme, so mobile browser chrome does not sit
+        as a light bar above a dark page (or the reverse). */}
+    <meta name="theme-color" content="#f7f7f6" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={BRAND.name} />

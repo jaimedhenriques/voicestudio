@@ -72,7 +72,10 @@ const capabilities = [
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    padding-block: clamp(var(--sn-space-10), 9vw, var(--sn-space-12));
+    /* Asymmetric on purpose: generous above so the headline has air, tighter
+       below because the capability cards bring their own section padding —
+       equal padding on both sides left a dead band between them. */
+    padding-block: clamp(var(--sn-space-9), 7vw, var(--sn-space-11)) var(--sn-space-8);
   }
 
   .hero-field {

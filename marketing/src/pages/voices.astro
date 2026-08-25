@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHeader from '../components/PageHeader.astro';
+
+const items = [
+  ['Clone', 'Record or upload a few seconds of clean speech. Zero-shot — no training run, no waiting.'],
+  ['Design', 'No reference clip? Describe the voice instead: age, accent, pitch, delivery.'],
+  ['Direct', 'Per-line instructions change how a line is read, not just what it says.'],
+  ['Own it', 'Mark a profile as your own voice with a recorded consent phrase. That flag is what lets an agent use it on a call.'],
+];
+---
+
+<Base
+  title="Voices"
+  description="Clone a voice from a few seconds of audio, or design one from scratch. 16 synthesis engines, one interface."
+>
+  <PageHeader
+    overline="Voices"
+    title="A voice from a few seconds of audio"
+    lede="Clone from a short reference clip, or design one from age, accent and delivery. Sixteen synthesis engines behind one interface, so the model can change without the workflow changing."
+  />
+
+  <section class="section page">
+    <dl class="grid">
+      {items.map(([term, detail]) => (
+        <div class="card">
+          <dt class="display-sm">{term}</dt>
+          <dd>{detail}</dd>
+        </div>
+      ))}
+    </dl>
+
+    <p class="note">
+      Everything the app synthesizes carries an inaudible AudioSeal watermark, so audio it made
+      stays identifiable as audio it made. On the desktop app it is a setting; for agents it is not.
+    </p>
+  </section>
+</Base>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: var(--sn-space-5);
+    margin: 0;
+  }
+
+  dt {
+    margin-bottom: var(--sn-space-4);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--sn-text-muted);
+    font-size: var(--sn-text-body-sm);
+  }
+
+  .note {
+    margin-top: var(--sn-space-8);
+    color: var(--sn-text-subtle);
+    font-size: var(--sn-text-body-sm);
+    max-width: var(--sn-measure-prose);
+  }
+</style>

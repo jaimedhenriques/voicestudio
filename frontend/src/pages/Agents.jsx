@@ -170,6 +170,8 @@ export default function Agents({ profiles = [] }) {
             <Panel title={t('agents.configure')}>
               <Field label={t('agents.name')}>
                 <Input
+                  autoComplete="off"
+                  spellCheck={false}
                   value={draft.name}
                   onChange={(e) => setDraft({ ...draft, name: e.target.value })}
                 />
@@ -395,6 +397,8 @@ function CallPanel({ agent, t }) {
 
       <Field label={t('agents.destination')} hint={t('agents.destinationHint')}>
         <Input
+          type="tel"
+          autoComplete="tel"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
           placeholder="+14155550123"
