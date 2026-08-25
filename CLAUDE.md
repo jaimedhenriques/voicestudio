@@ -66,10 +66,22 @@ Architecture not yet mapped. Follow existing patterns found in the codebase.
 <!-- GSD:skills-start source:skills/ -->
 ## Project Skills
 
+**Engineering**
+
 - `vite` — Vite configuration, assets, HMR, builds, and Vitest guidance.
 - `fastapi-python` — FastAPI and Pydantic implementation patterns.
 
-Canonical copies live under `.agents/skills/`; `skills-lock.json` pins their sources and hashes. Claude should follow these paths directly, avoiding cross-platform symlinks.
+**Design** (added for the hosted-platform UI/UX work)
+
+- `design-taste-frontend` — anti-templated frontend: infer the brief, pick a real design direction, pre-flight check before shipping.
+- `minimalist-ui` — editorial monochrome interfaces: typographic contrast, flat grids, no gradients or heavy shadows. Closest to our house style.
+- `high-end-visual-design` — the fonts, spacing, shadows, and card structures that read as expensive; blocks the defaults that read as cheap.
+- `redesign-existing-projects` — audit-first upgrades of existing UI without breaking behaviour. The right entry point for reskinning `frontend/`.
+- `image-to-code` — design-image-first workflow: generate the reference, analyse it, then implement to match.
+- `brandkit` — brand-guideline boards, logo systems, identity decks.
+- `web-design-guidelines` — audits UI code against the Web Interface Guidelines (accessibility, UX). Run before landing frontend work.
+
+Canonical copies live under `.agents/skills/`; `skills-lock.json` pins their sources and hashes. Claude should follow these paths directly, avoiding cross-platform symlinks — `npx skills add` creates symlinks under `.claude/skills/` by default, so delete those after installing and keep only the `.agents/skills/` copy.
 <!-- GSD:skills-end -->
 
 <!-- GSD:workflow-start source:GSD defaults -->
