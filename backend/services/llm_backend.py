@@ -147,7 +147,8 @@ class OpenAICompatBackend(LLMBackend):
         )
 
     def chat_messages(self, *, messages: list[dict], timeout: Optional[float] = None,
-                      temperature: Optional[float] = None) -> str:
+                      temperature: Optional[float] = None,
+                      max_tokens: Optional[int] = None) -> str:
         """One-shot completion over a full message list.
 
         Additive surface for callers that need structured few-shot turns
@@ -158,6 +159,9 @@ class OpenAICompatBackend(LLMBackend):
         ``temperature`` is only forwarded when set (Cinematic/Autofit pin 0.2
         — the provider default of 1.0 makes local models drift and invent);
         every other caller leaves it None and keeps the provider default.
+        ``max_tokens`` follows the same forward-only-when-set rule; it exists
+        for the OpenAI-compatible chat endpoint, which must honour a client's
+        limit rather than quietly return more than it asked for.
         """
         if timeout is None:
             try:
@@ -167,6 +171,8 @@ class OpenAICompatBackend(LLMBackend):
         kw = {}
         if temperature is not None:
             kw["temperature"] = temperature
+        if max_tokens is not None:
+            kw["max_tokens"] = max_tokens
         res = self._get_client().chat.completions.create(
             model=self.model_name,
             timeout=timeout,
@@ -177,7 +183,8 @@ class OpenAICompatBackend(LLMBackend):
 
     def chat_messages_stream(self, *, messages: list[dict],
                              timeout: Optional[float] = None,
-                             temperature: Optional[float] = None):
+                             temperature: Optional[float] = None,
+                             max_tokens: Optional[int] = None):
         """Yield assistant content deltas as they arrive.
 
         Additive alongside ``chat_messages`` — same request, ``stream=True``.
@@ -203,6 +210,8 @@ class OpenAICompatBackend(LLMBackend):
         kw = {}
         if temperature is not None:
             kw["temperature"] = temperature
+        if max_tokens is not None:
+            kw["max_tokens"] = max_tokens
         stream = self._get_client().chat.completions.create(
             model=self.model_name,
             timeout=timeout,
