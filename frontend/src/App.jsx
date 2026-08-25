@@ -202,6 +202,9 @@ function App() {
   // zustand persist rehydrates (async from localStorage) and when the user
   // changes them at runtime.
   useEffect(() => {
+    // Gruvbox is the bare `:root` (no [data-theme] block), so it is the one
+    // theme applied by REMOVING the attribute. `theme` is never empty — the
+    // store defaults to 'sonari' — but keep the guard for a corrupted persist.
     if (theme && theme !== 'gruvbox') {
       document.documentElement.setAttribute('data-theme', theme);
     } else {

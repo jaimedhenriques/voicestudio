@@ -5,7 +5,12 @@
 // fail the snapshot — so drift is caught, not silent).
 //
 // THEMES: 'default' is the bare-:root Gruvbox Dark; every other name maps to
-// a [data-theme="…"] block in ui/themes.css.
+// a [data-theme="…"] block in index.css.
+//
+// NOTE 'default' is NOT the theme new installs get. The store default is
+// 'sonari' (prefsSlice.ts), which has its own [data-theme] block — 'default'
+// here means the bare `:root`, which is Gruvbox. 'sonari' is listed explicitly
+// below so the brand theme is actually covered.
 export const COMPONENTS = [
   'Badge',
   'Segmented',
@@ -31,4 +36,4 @@ export const COMPONENTS = [
   'UninstallPanel',
 ] as const;
 
-export const THEMES = ['default', 'midnight', 'catppuccin'] as const;
+export const THEMES = ['default', 'sonari', 'midnight', 'catppuccin'] as const;

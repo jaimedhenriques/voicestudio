@@ -10,7 +10,14 @@ import type { StateCreator } from 'zustand';
 import { apiJson, apiPost } from '../api/client';
 
 type TranslateQuality = 'fast' | 'autofit' | 'cinematic';
-type ThemeId = 'gruvbox' | 'midnight' | 'nord' | 'solarized' | 'rose-pine' | 'catppuccin';
+type ThemeId =
+  | 'sonari'
+  | 'gruvbox'
+  | 'midnight'
+  | 'nord'
+  | 'solarized'
+  | 'rose-pine'
+  | 'catppuccin';
 
 /** Dictation start/stop semantics — mirror of the backend `dictation.mode`. */
 type DictationMode = 'toggle' | 'hold';
@@ -396,10 +403,13 @@ export const createPrefsSlice: StateCreator<PrefsSlice, [], [], PrefsSlice> = (s
   langPromptSeen: false,
   setLangPromptSeen: (seen) => set({ langPromptSeen: seen }),
 
-  theme: 'gruvbox',
+  theme: 'sonari',
   setTheme: (id) => {
     set({ theme: id });
-    // Apply to DOM — gruvbox is default (no attribute)
+    // Gruvbox is the ONLY theme without a [data-theme] block — it is the bare
+    // `:root`, so selecting it means removing the attribute. Every other theme,
+    // Sonari included, sets it. (Sonari is the store default, but index.html
+    // stamps it pre-paint so first paint is never wrong; see that file.)
     if (id === 'gruvbox') {
       document.documentElement.removeAttribute('data-theme');
     } else {

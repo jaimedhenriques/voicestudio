@@ -35,6 +35,24 @@ token pipeline, so the snapshots reflect the actual build output.
 
 ## Commands
 
+> **Baselines are machine-specific, and the committed set is currently
+> incomplete.** The PNGs here were generated on one machine and, as the config
+> comment says, are correct for that machine. On a different host, font
+> hinting and anti-aliasing push a handful of text-heavy specs (`ShadcnButton`,
+> `SettingRow`, `StoragePanel`, `ResetPanel`, `UninstallPanel`,
+> `AppearancePanel`) past the 1% tolerance even with no code change at all —
+> verified by running the suite against an unmodified tree.
+>
+> There are also **no baselines for the `sonari` theme yet**. It was added to
+> `manifest.ts` so the brand theme is covered, but generating its PNGs on a
+> second machine would leave the directory half from one host and half from
+> another, which is more confusing than a missing file. Run
+> `bun run test:visual:update` once on the machine that owns the baselines to
+> regenerate the whole set consistently.
+>
+> This suite is local/manual, not a CI gate (see below), so neither situation
+> blocks a merge.
+
 ```bash
 bun run test:visual          # run snapshots against the committed baselines
 bun run test:visual:update   # regenerate baselines (after an INTENTIONAL change)
