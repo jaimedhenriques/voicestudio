@@ -7135,3 +7135,25 @@ button.dub-stepper__action:focus-visible {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* Agent voice visualiser — the ElevenLabs UI BarVisualizer, driven by the
+   real /ws/converse state. Colour comes from the theme's brand token so it
+   recolours with every [data-theme] like everything else. */
+.agents-visualizer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 72px;
+  margin-bottom: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-elev-2);
+  color: var(--color-brand);
+}
+
+/* The component sizes its bars from currentColor and the container box. */
+.agents-visualizer > * {
+  width: 100%;
+  height: 100%;
+}

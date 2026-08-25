@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Bot, Phone, PhoneOff, Plus, Trash2 } from 'lucide-react';
 
 import { Button, Field, Input, Panel, Textarea, Select, Badge } from '../ui';
+import { BarVisualizer } from '@/components/ui/vendor/elevenlabs/bar-visualizer';
 import {
   createAgent,
   deleteAgent,
@@ -257,6 +258,21 @@ function ReadinessPanel({ readiness, t }) {
   );
 }
 
+/**
+ * Our `/ws/converse` state names onto BarVisualizer's `AgentState` union.
+ *
+ * Deliberately explicit rather than passing `state` straight through: the two
+ * vocabularies agree today only by coincidence, and an unmapped value makes
+ * the visualiser fall back to a resting pose with no error — a mismatch that
+ * would look like "the animation is broken" rather than "a state was renamed".
+ */
+const VISUALIZER_STATE = {
+  idle: undefined,
+  thinking: 'thinking',
+  speaking: 'speaking',
+  listening: 'listening',
+};
+
 function TestConversation({ agent, t }) {
   const [transcript, setTranscript] = useState([]);
   const [input, setInput] = useState('');
@@ -333,6 +349,24 @@ function TestConversation({ agent, t }) {
   return (
     <Panel title={t('agents.testTitle')}>
       <p className="agents-hint">{t('agents.testHint')}</p>
+
+      {live && (
+        <div className="agents-visualizer">
+          {/*
+            Driven by the real conversation state, not a timer: the bars move
+            because the agent is thinking or speaking, so the animation is
+            information rather than decoration. aria-hidden because the same
+            state is already announced in text by the status line below.
+          */}
+          <BarVisualizer
+            state={VISUALIZER_STATE[state]}
+            barCount={24}
+            centerAlign
+            demo={state === 'thinking' || state === 'speaking'}
+            aria-hidden="true"
+          />
+        </div>
+      )}
 
       <div className="agents-transcript" aria-live="polite">
         {transcript.map((line, i) => (
