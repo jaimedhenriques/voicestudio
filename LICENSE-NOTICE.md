@@ -55,8 +55,10 @@ header naming its origin; the licences are reproduced here.
 Copied from <https://github.com/elevenlabs/ui> (`apps/www/registry/elevenlabs-ui/ui/`).
 Vendored rather than installed because that project distributes through a
 shadcn registry aimed at Next.js app-router projects, while this app is
-Vite + React. The components are unmodified apart from a dropped `"use client"`
-directive and two explicit type annotations, both marked `SONARI:` in-file.
+Vite + React. `bar-visualizer.tsx` is unmodified apart from a dropped
+`"use client"` directive and two explicit type annotations, both marked
+`SONARI:` in-file — keeping the diff that small is what makes a future re-sync
+from upstream a fast-forward rather than a merge conflict.
 
 ```
 MIT License
