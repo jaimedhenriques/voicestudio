@@ -278,6 +278,63 @@ _BASE_SCHEMA = """
     );
     CREATE INDEX IF NOT EXISTS idx_remote_attempts_task ON remote_task_attempts(task_id);
     CREATE INDEX IF NOT EXISTS idx_remote_attempts_worker ON remote_task_attempts(worker_id, state);
+
+    -- Voice agents (alembic 0011_voice_agents). Mirrored here because this
+    -- startup schema is the fallback for bundled installs, where Alembic is
+    -- not available.
+    CREATE TABLE IF NOT EXISTS agents (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        system_prompt TEXT NOT NULL DEFAULT '',
+        first_message TEXT NOT NULL DEFAULT '',
+        voice_profile TEXT,
+        language TEXT NOT NULL DEFAULT 'en',
+        llm_model TEXT,
+        temperature REAL,
+        enabled INTEGER NOT NULL DEFAULT 1,
+        created_at REAL NOT NULL,
+        updated_at REAL NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS conversations (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT REFERENCES agents(id) ON DELETE SET NULL,
+        title TEXT NOT NULL DEFAULT '',
+        channel TEXT NOT NULL DEFAULT 'browser',
+        created_at REAL NOT NULL,
+        updated_at REAL NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS conversation_turns (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+        role TEXT NOT NULL,
+        text TEXT NOT NULL,
+        interrupted INTEGER NOT NULL DEFAULT 0,
+        created_at REAL NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS ix_turns_conversation ON conversation_turns(conversation_id, id);
+
+    -- Telephony guardrail tables (§R1 guardrails 4 and 5). The allowlist is
+    -- what makes bulk dialling structurally impossible; telephony_calls logs
+    -- EVERY attempt including refusals, and is never deleted.
+    CREATE TABLE IF NOT EXISTS telephony_allowlist (
+        e164 TEXT PRIMARY KEY,
+        label TEXT NOT NULL DEFAULT '',
+        created_at REAL NOT NULL
+    );
+    CREATE TABLE IF NOT EXISTS telephony_calls (
+        id TEXT PRIMARY KEY,
+        agent_id TEXT,
+        destination TEXT NOT NULL,
+        status TEXT NOT NULL,
+        refused_reason TEXT,
+        disclosure_text TEXT NOT NULL DEFAULT '',
+        recorded INTEGER NOT NULL DEFAULT 0,
+        duration_s REAL,
+        created_at REAL NOT NULL,
+        ended_at REAL
+    );
+    CREATE INDEX IF NOT EXISTS ix_telephony_calls_created ON telephony_calls(created_at);
+    CREATE INDEX IF NOT EXISTS ix_telephony_calls_status ON telephony_calls(status);
 """
 
 # Only tables/columns this module is allowed to ALTER. Prevents SQL injection via

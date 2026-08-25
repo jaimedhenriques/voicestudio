@@ -199,10 +199,28 @@ def test_the_public_env_var_prefix_is_unchanged(env_var):
 # ── and the half that DID change ───────────────────────────────────────────
 
 
-def test_the_product_name_is_the_new_one():
+def test_the_displayed_name_is_the_new_one_but_productname_is_not():
+    """Second rename, same rule: only what the user READS moves.
+
+    This fork renames the product again (VoiceStudio → Sonari), and the split
+    is now finer than last time, because `productName` turned out to be on the
+    wrong side of it. It is not cosmetic:
+
+      * it names the installer and the app bundle (`Sonari.app`, `Sonari.exe`),
+        so changing it makes an upgrade install a SECOND copy beside the first
+        rather than replacing it;
+      * `scripts/build_preview_manifest.py` matches release artifacts by that
+        filename, so a change there silently breaks every preview build;
+      * the updater identifies the installed app by it.
+
+    So `productName` stays `VoiceStudio` until a tested migration exists, and
+    the window title — which is genuinely just text on screen — moves. If a
+    future consistency sweep changes `productName` to match the brand, this
+    test is what stops it.
+    """
     conf = json.loads(_read("frontend/src-tauri/tauri.conf.json"))
-    assert conf["productName"] == "VoiceStudio"
-    assert conf["app"]["windows"][0]["title"] == "VoiceStudio"
+    assert conf["productName"] == "VoiceStudio", WHY
+    assert conf["app"]["windows"][0]["title"] == "Sonari"
 
 
 def test_the_release_artifact_patterns_follow_the_product_name():
