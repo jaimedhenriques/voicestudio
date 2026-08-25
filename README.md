@@ -99,6 +99,7 @@ Use `bun run dev` for the browser UI. See [Contributing](.github/CONTRIBUTING.md
 
 | Area | Included |
 |---|---|
+| **[Voice Agents](docs/telephony.md)** | Give an agent a voice and a brief, then talk to it — streamed replies, sentence-by-sentence speech, and barge-in |
 | **Voice Cloning** | Zero-shot synthesis from a short reference clip |
 | **Voice Design** | Create a voice from age, accent, pitch, style, and delivery instructions |
 | **Video Dubbing** | Transcribe, translate, preserve speakers, synthesize, and export video |

@@ -10,6 +10,9 @@ the frozen-backend fallback mirror it for their toolchains.
 
 **Highlights**
 
+- Voice agents: give an agent a voice and a brief, then talk to it — it answers out loud and stops the moment you interrupt (#1652)
+- Phone calls are built and deliberately not enabled: all six safeguards are enforced and tested, the carrier account and customer verification are not (#1652)
+- A new brand and design system shared by the app and a new marketing site, with Sonari as the default theme (#1652)
 - Dictation now stays bound to the app where it started and recovers locally from silent recognizer output (#1175)
 - The backend now answers within a second of launch and narrates its startup step by step (#1550)
 - Reporting a bug from an outdated build now offers the latest release first (#1547)
@@ -18,10 +21,14 @@ the frozen-backend fallback mirror it for their toolchains.
 - Dub subtitles can be retimed, inserted, and merged in either direction from the segment table (#1612) — thanks @invio-a11y!
 
 ### Changed
+- New default theme (Sonari) and a shared design-token package the app and marketing site both read, so the brand cannot drift between them; every previous theme stays selectable and existing installs keep the theme they chose (#1652)
 - Dictation now carries one native output session from shortcut-down through final delivery, restores text, HTML, image, or file-list clipboards only when untouched, keeps Wayland copy-safe unless current-focus insertion is explicitly enabled, and retries silent Sherpa speech only through an already-installed local ASR model (#1175)
 - The backend binds its port immediately and reports startup progress live — `/health` answers 503-with-step and a new `/startup/progress` endpoint lists every step while PyTorch, API routes, and database migrations load in the background, so "starting at step X" is never mistakable for "dead"; the desktop splash narrates each step (#1550)
 
 ### Added
+- Voice agents — a new Agents workspace where an agent gets instructions, a first message and a voice, then holds a live conversation: the reply streams from the language model, each finished sentence is synthesized while the next is still generating, playback is gapless, and barge-in stops the audio locally before the server round trip (#1652)
+- Outbound calling, built but not provisioned — the disclosure preamble, consent-locked voice requirement, always-on watermark, destination allowlist with a daily cap, and immutable attempt log are all enforced in code and covered by 32 tests that need no carrier account; `POST /telephony/calls` returns 501 until a carrier, 10DLC registration and customer verification exist (#1652)
+- `chat_messages_stream()` on the LLM adapter, so a reply can start being spoken before it has finished generating (#1652)
 - Headless NVIDIA and ROCm machines can now join as worker-only Docker Compose services with no published UI and durable protocol-v2 enrollment; update both machines together before reconnecting (#1638) — thanks @jkrogers9862!
 - Linux ARM64 (Asahi Apple Silicon) support for the OmniVoice GGUF engine — a `linux-aarch64` binary built with GGML Vulkan where the toolchain allows it, so Apple GPUs accelerate generation through the open-source Honeykrisp driver instead of falling back to CPU-only (#1641)
 - One-command install on every desktop OS: `curl -fsSL https://voicestudio.sh/install | sh` (macOS/Linux/WSL) or `irm https://voicestudio.sh/install | iex` (Windows) — the URL serves the right script per platform, and Windows gains a source installer (`scripts/install.ps1`) with a 3-OS CI smoke (#1626)
@@ -37,6 +44,8 @@ the frozen-backend fallback mirror it for their toolchains.
 - Opt-in 24-layer PocketTTS checkpoints via `OMNIVOICE_POCKETTTS_24L` — better prosody for it/de/es/pt at roughly 2x render time (still faster than real-time); the fast 6-layer model stays the default (#1613) — thanks @paoloantinori!
 
 ### Docs
+- `docs/telephony.md` — what the law actually requires of AI voice calls (FCC 24-17, Texas SB 140, the ELVIS Act, EU AI Act Art. 50), which safeguards enforce it, and what has to exist before a first real call (#1652)
+- `docs/design/design-language.md` — the five rules behind the design tokens, and the `index.css` cascade rules that have already caused one shipped regression (#1652)
 - The Docker Hub overview now shows the current engine-switching demo, Model Catalogue, and gallery voice workflow (#1593)
 - The Docker Hub overview and install guide now show the v0.5 tags and the built-in API-key/share-PIN security model instead of obsolete v0.4 and no-authentication guidance (#1592)
 - The READMEs now lead with download buttons and a three-step first-clone walkthrough, and a new benchmarks page anchors measured per-engine/per-device numbers on the in-repo harness (#1555)

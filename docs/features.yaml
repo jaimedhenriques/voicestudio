@@ -9,6 +9,7 @@
 
 # Each name must appear verbatim in README.md (the Features grid).
 features:
+  - Voice Agents
   - Voice Cloning
   - Voice Design
   - Video Dubbing
