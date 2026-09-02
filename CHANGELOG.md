@@ -21,6 +21,7 @@ the frozen-backend fallback mirror it for their toolchains.
 - Dub subtitles can be retimed, inserted, and merged in either direction from the segment table (#1612) — thanks @invio-a11y!
 
 ### Changed
+- Product plan locks Voice Studio as an independent AGPL-3.0 TTS studio for creators (ElevenLabs-class, no store)
 - New default theme (Sonari) and a shared design-token package the app and marketing site both read, so the brand cannot drift between them; every previous theme stays selectable and existing installs keep the theme they chose (#1652)
 - Dictation now carries one native output session from shortcut-down through final delivery, restores text, HTML, image, or file-list clipboards only when untouched, keeps Wayland copy-safe unless current-focus insertion is explicitly enabled, and retries silent Sherpa speech only through an already-installed local ASR model (#1175)
 - The backend binds its port immediately and reports startup progress live — `/health` answers 503-with-step and a new `/startup/progress` endpoint lists every step while PyTorch, API routes, and database migrations load in the background, so "starting at step X" is never mistakable for "dead"; the desktop splash narrates each step (#1550)
