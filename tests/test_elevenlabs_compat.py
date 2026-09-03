@@ -317,3 +317,70 @@ def test_int_and_bool_literals_are_accepted(
     )
     assert r.status_code == 200, r.text
     assert active_engine.last_kwargs["speed"] == expected_speed
+
+
+@pytest.mark.parametrize(
+    "field",
+    ["stability", "similarity_boost", "style", "use_speaker_boost", "speed"],
+)
+def test_explicit_null_on_a_field_is_422(client, profile, field) -> None:
+    """An omitted key means "no opinion"; `null` means the client sent a value
+    and that value is wrong. Every field being Optional made pydantic read the
+    two as identical, which contradicted the documented 422."""
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={"text": "hello", "voice_settings": {field: None}},
+    )
+    assert r.status_code == 422, r.text
+
+
+def test_empty_voice_settings_object_is_accepted(client, profile, active_engine) -> None:
+    """`{}` mentions no field at all, so it is an omission, not a null."""
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={"text": "hello", "voice_settings": {}},
+    )
+    assert r.status_code == 200, r.text
+    assert active_engine.last_kwargs["speed"] == 1.0
+
+
+def test_null_voice_settings_object_is_accepted(client, profile, active_engine) -> None:
+    """A null WHOLE object stays valid: SDKs that serialize every field emit
+    `"voice_settings": null` for "I am not sending settings", which is an
+    omission the serializer made explicit — not a bad value inside a settings
+    object the caller chose to send."""
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={"text": "hello", "voice_settings": None},
+    )
+    assert r.status_code == 200, r.text
+    assert active_engine.last_kwargs["speed"] == 1.0
+
+
+def test_null_alongside_a_valid_field_is_still_422(client, profile) -> None:
+    """One good field does not excuse a null sibling."""
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={"text": "hello", "voice_settings": {"speed": 1.5, "stability": None}},
+    )
+    assert r.status_code == 422, r.text
+
+
+def test_unknown_field_null_behaves_like_unknown_field_non_null(
+    client, profile, active_engine
+) -> None:
+    """The null guard covers the five declared fields only.
+
+    An unknown key is outside this endpoint's contract; whatever the model
+    does with it (drop it, under pydantic's default `extra` policy) must not
+    change just because its value happens to be null."""
+    def post(value):
+        return client.post(
+            f"/v1/text-to-speech/{profile}",
+            json={"text": "hello", "voice_settings": {"speed": 1.5, "unknown_knob": value}},
+        )
+
+    non_null, null = post("whatever"), post(None)
+    assert non_null.status_code == null.status_code, (non_null.text, null.text)
+    assert null.status_code == 200, null.text
+    assert active_engine.last_kwargs["speed"] == 1.5

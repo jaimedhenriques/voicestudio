@@ -32,7 +32,9 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
-from pydantic import BaseModel, ConfigDict, Field, StrictBool, field_validator
+from pydantic import (
+    BaseModel, ConfigDict, Field, StrictBool, field_validator, model_validator,
+)
 
 router = APIRouter(prefix="/v1", tags=["ElevenLabs-Compatible API"])
 
@@ -43,8 +45,11 @@ router = APIRouter(prefix="/v1", tags=["ElevenLabs-Compatible API"])
 class VoiceSettings(BaseModel):
     """ElevenLabs' `voice_settings` object.
 
-    Every field is optional and validated, so an out-of-range value is refused
-    with a 422 rather than silently clamped. Only `speed` is honoured — see the
+    Every field may be omitted, but none may be sent as `null`: an omitted key
+    means "no opinion", while `"speed": null` is a client error, and the two
+    must not be conflated. Values that are present are type- and
+    range-validated, so a wrong type or an out-of-range number is refused with
+    a 422 rather than coerced or clamped. Only `speed` is honoured — see the
     field descriptions for what each one does here.
     """
 
@@ -71,6 +76,33 @@ class VoiceSettings(BaseModel):
             "range is this backend's 0.25–4.0, a superset of ElevenLabs' 0.7–1.2."
         ),
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _no_explicit_nulls(cls, data: Any) -> Any:
+        """Refuse any key that was sent with an explicit `null`.
+
+        Every field is optional, so pydantic reads `"speed": null` as "not
+        set" and accepts it — silently, and against what the docs promise. An
+        omitted key still defaults; only a key that is actually present with a
+        null value is refused, so this cannot change the meaning of a payload
+        that never mentioned the field.
+
+        Scoped to the declared fields: an unknown key is not part of this
+        contract, and whether it is dropped (pydantic's default `extra`
+        policy here) is not something a null value should change.
+        """
+        if isinstance(data, dict):
+            nulls = sorted(
+                k for k, v in data.items() if v is None and k in cls.model_fields
+            )
+            if nulls:
+                raise ValueError(
+                    "must not be null: "
+                    + ", ".join(nulls)
+                    + " — omit the key instead"
+                )
+        return data
 
     @field_validator("stability", "similarity_boost", "style", "speed", mode="before")
     @classmethod
@@ -118,7 +150,9 @@ class TextToSpeechRequest(BaseModel):
             "then ignored. The four ignored fields have no equivalent in any "
             "engine here, but a request is never refused over a knob we cannot "
             "honour. A wrong type or an out-of-range value is a 422, never a "
-            "silent coercion or clamp."
+            "silent coercion or clamp, and so is an explicit `null` on any of "
+            "the five fields — omit the key instead. `voice_settings` itself "
+            "may be null or omitted, both meaning \"no settings\"."
         ),
     )
 

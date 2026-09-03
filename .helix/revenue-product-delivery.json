@@ -4,19 +4,19 @@
   "company": "Voice Studio",
   "artifactType": "macos-agent",
   "icp": "Creators who need text-to-speech: voiceover, narration, dubbing, and audiobook workflows, not dictation users.",
-  "pain": "Creator tooling already integrates the hosted ElevenLabs API shape, and those clients send voice_settings such as speed; silently dropping them makes the local endpoint produce the wrong narration pacing for existing pipelines.",
-  "revenueHypothesis": "Honoring voice_settings.speed makes the ElevenLabs-compatible endpoint behaviorally compatible for real client payloads, deepening drop-in adoption of the local studio in paid creator workflows.",
+  "pain": "The ElevenLabs-compatible endpoint documents a strict voice_settings contract, but an explicit JSON null slips past validation, so a malformed client payload is silently accepted instead of producing the promised 422.",
+  "revenueHypothesis": "A compatibility layer whose documented contract actually holds is what makes creator pipelines trust the local studio as a drop-in replacement; each contract gap erodes that adoption.",
   "mvpAcceptance": [
-    "POST /v1/text-to-speech/{voice_id} validates voice_settings types and ranges (stability, similarity_boost, style in 0-1; speed in the backend-supported 0.25-4.0; use_speaker_boost boolean) and rejects invalid values with 422",
-    "voice_settings.speed is passed through to the existing synthesis speed parameter so a request with speed 1.5 produces audio synthesized at speed 1.5",
-    "New mocked-backend pytest coverage for validation and speed pass-through passes, and the existing elevenlabs_compat and router smoke suites still pass"
+    "POST /v1/text-to-speech/{voice_id} with an explicit JSON null on any voice_settings field (stability, similarity_boost, style, use_speaker_boost, speed) returns 422",
+    "Omitted voice_settings keys keep their current default behavior and omitted voice_settings still defaults speed to 1.0",
+    "New mocked-backend pytest coverage for the null cases passes, and the existing elevenlabs_compat and router smoke suites still pass"
   ],
   "codingTool": "claude-code",
   "maker": "claude-code-maker",
   "copySafety": {
     "proprietaryAssetsExcluded": true,
     "publicPatternSources": [
-      "ElevenLabs public API documentation voice_settings field names and ranges only; no proprietary code, assets, or branding copied"
+      "ElevenLabs public API documentation voice_settings field names only; no proprietary code, assets, or branding copied"
     ]
   },
   "limits": {
@@ -25,11 +25,11 @@
     "maxAttempts": 3
   },
   "stopConditions": [
-    "Stop after this single slice once the draft PR is open and independently verified",
+    "Stop after this single slice once the draft PR is updated and independently verified",
     "Stop if CI cannot run on the fork or the check run cannot be verified live",
     "Stop if any change would touch LICENSE, store/marketplace paths, GPU/hosted inference, or public copy naming a person"
   ],
-  "rollback": "Revert the single slice commit on branch helix/elevenlabs-voice-settings and close the draft PR; no database or settings migrations are introduced.",
+  "rollback": "Revert the single slice commit on branch helix/elevenlabs-voice-settings; no database or settings migrations are introduced.",
   "evidenceDestination": ".helix/evidence",
   "executionEvidence": ".helix/evidence/execution.json",
   "github": {
@@ -47,13 +47,13 @@
       }
     ],
     "checker": "codex-cli-reviewer",
-    "checkerEvidence": "controller://checker/voice-studio-voice-settings-20260903"
+    "checkerEvidence": "controller://checker/voice-studio-null-settings-20260903"
   },
   "vercel": {
     "mode": "not_applicable",
     "category": "macos-agent",
     "exceptionReason": "Voice Studio is a local-first desktop application (Tauri shell plus local FastAPI backend) that runs on the user's own machine; there is no hosted web deployment to verify on Vercel.",
     "runtimeEvidence": ".helix/evidence/runtime.json",
-    "approvalEvidence": "controller://exception/voice-studio-voice-settings-vercel-20260903"
+    "approvalEvidence": "controller://exception/voice-studio-null-settings-vercel-20260903"
   }
 }

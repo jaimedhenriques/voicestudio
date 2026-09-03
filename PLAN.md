@@ -77,3 +77,15 @@ Do not invent a parallel design system.
 - Next increment: run the official ElevenLabs Python SDK against the local
   server with a small real model loaded, and map stability/similarity if an
   engine exposes a genuine equivalent.
+
+## Increment 2026-09-03 (3) — reject explicit null in voice_settings
+
+- Pain: the documented strict contract leaked — explicit JSON null was
+  accepted for every voice_settings field instead of returning 422.
+- Scope: one validation rule (explicit null on any voice_settings field
+  is a 422; omitted keys unchanged), regression tests, doc wording. This
+  is the final checker finding from slice 2 (issue #8, PR #7).
+- Test gate: null-on-each-field 422 cases plus the existing 63-test
+  targeted set, green locally and in CI.
+- Next increment: run the official ElevenLabs Python SDK against the
+  local server with a small real model loaded.
