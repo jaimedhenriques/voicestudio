@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 2,
+  "project": "voicestudio",
+  "company": "Voice Studio",
+  "artifactType": "macos-agent",
+  "icp": "Creators who need text-to-speech: voiceover, narration, dubbing, and audiobook workflows, not dictation users.",
+  "pain": "The ElevenLabs-compatible endpoints are proven only against mocked backends; without an end-to-end run with the official SDK, a real client payload could still fail against the live local server.",
+  "revenueHypothesis": "A documented, repeatable proof that the official ElevenLabs SDK works against the local studio converts compatibility from a claim into evidence, which is what makes creator pipelines switch.",
+  "mvpAcceptance": [
+    "scripts/verify_elevenlabs_sdk.py drives the official elevenlabs Python SDK against a running local server: voices list parses, text_to_speech.convert returns real audio bytes, voice_settings speed is accepted",
+    "The script is executed for real against the small CPU engine (KittenTTS) and the transcript is recorded as evidence",
+    "No repository dependency changes (script runs via uv run --with elevenlabs); existing test suites still pass"
+  ],
+  "codingTool": "claude-code",
+  "maker": "claude-code-maker",
+  "copySafety": {
+    "proprietaryAssetsExcluded": true,
+    "publicPatternSources": [
+      "ElevenLabs public API documentation voice_settings field names only; no proprietary code, assets, or branding copied"
+    ]
+  },
+  "limits": {
+    "maxMinutes": 45,
+    "maxAgents": 3,
+    "maxAttempts": 3
+  },
+  "stopConditions": [
+    "Stop after this single slice once the draft PR is updated and independently verified",
+    "Stop if CI cannot run on the fork or the check run cannot be verified live",
+    "Stop if any change would touch LICENSE, store/marketplace paths, GPU/hosted inference, or public copy naming a person"
+  ],
+  "rollback": "Revert the single slice commit on branch helix/elevenlabs-voice-settings; the change adds a verification script and docs only, no runtime behavior changes.",
+  "evidenceDestination": ".helix/evidence",
+  "executionEvidence": ".helix/evidence/execution.json",
+  "github": {
+    "repo": "jaimedhenriques/voicestudio",
+    "remote": "origin",
+    "branch": "helix/elevenlabs-voice-settings",
+    "baseBranch": "main",
+    "commit": "HEAD"
+  },
+  "verification": {
+    "checks": [
+      {
+        "name": "Tests (backend + frontend)",
+        "evidence": ".helix/evidence/check-tests.json"
+      }
+    ],
+    "checker": "codex-cli-reviewer",
+    "checkerEvidence": "controller://checker/voice-studio-sdk-e2e-20260903"
+  },
+  "vercel": {
+    "mode": "not_applicable",
+    "category": "macos-agent",
+    "exceptionReason": "Voice Studio is a local-first desktop application (Tauri shell plus local FastAPI backend) that runs on the user's own machine; there is no hosted web deployment to verify on Vercel.",
+    "runtimeEvidence": ".helix/evidence/runtime.json",
+    "approvalEvidence": "controller://exception/voice-studio-sdk-e2e-vercel-20260903"
+  }
+}

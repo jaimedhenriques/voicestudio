@@ -21,11 +21,15 @@ the frozen-backend fallback mirror it for their toolchains.
 - Dub subtitles can be retimed, inserted, and merged in either direction from the segment table (#1612) — thanks @invio-a11y!
 
 ### Changed
+- Product plan locks Voice Studio as an independent AGPL-3.0 TTS studio for creators (ElevenLabs-class, no store)
 - New default theme (Sonari) and a shared design-token package the app and marketing site both read, so the brand cannot drift between them; every previous theme stays selectable and existing installs keep the theme they chose (#1652)
 - Dictation now carries one native output session from shortcut-down through final delivery, restores text, HTML, image, or file-list clipboards only when untouched, keeps Wayland copy-safe unless current-focus insertion is explicitly enabled, and retries silent Sherpa speech only through an already-installed local ASR model (#1175)
 - The backend binds its port immediately and reports startup progress live — `/health` answers 503-with-step and a new `/startup/progress` endpoint lists every step while PyTorch, API routes, and database migrations load in the background, so "starting at step X" is never mistakable for "dead"; the desktop splash narrates each step (#1550)
 
 ### Added
+- The ElevenLabs-compatible endpoints are now proven against the official `elevenlabs` Python SDK, not only mocks — `scripts/verify_elevenlabs_sdk.py` drives voice listing, synthesis and the validation contract against a running local server and prints a pass/fail transcript (#7)
+- `voice_settings` on the ElevenLabs-compatible endpoint is now validated and its `speed` is honoured; `stability`, `similarity_boost`, `style` and `use_speaker_boost` stay accepted-and-ignored, and an out-of-range value — or an explicit `null` on any of the five fields — returns 422 instead of being silently clamped or read as an omission (#7)
+- `GET /v1/voices` and `POST /v1/text-to-speech/{voice_id}` — ElevenLabs API-compatible endpoints built from the public API docs, so tooling that already speaks that shape works against a local install by swapping the base URL (#4)
 - Voice agents — a new Agents workspace where an agent gets instructions, a first message and a voice, then holds a live conversation: the reply streams from the language model, each finished sentence is synthesized while the next is still generating, playback is gapless, and barge-in stops the audio locally before the server round trip (#1652)
 - Outbound calling, built but not provisioned — the disclosure preamble, consent-locked voice requirement, always-on watermark, destination allowlist with a daily cap, and immutable attempt log are all enforced in code and covered by 32 tests that need no carrier account; `POST /telephony/calls` returns 501 until a carrier, 10DLC registration and customer verification exist (#1652)
 - `chat_messages_stream()` on the LLM adapter, so a reply can start being spoken before it has finished generating (#1652)
