@@ -36,9 +36,15 @@ def client():
 
 @pytest.fixture(autouse=True)
 def clean_tables():
+    # Converge the schema here rather than only in the `client` fixture: a test
+    # that does not need HTTP still needs the tables, and without this it
+    # passes only when an earlier test in the module happened to build them.
+    # `init_db` is idempotent, so paying it per-test costs nothing.
+    init_db()
     with db_conn() as conn:
         for table in ("telephony_calls", "telephony_allowlist", "agents", "voice_profiles"):
-            conn.execute(f"DELETE FROM {table}")
+            # nosec B608 -- `table` iterates the literal tuple above; no input reaches it.
+            conn.execute(f"DELETE FROM {table}")  # noqa: S608
     yield
 
 
@@ -80,18 +86,22 @@ def test_agent_crud_round_trip(client):
     # A partial update must not blank the fields it did not mention.
     assert updated.json()["system_prompt"] == "Be brief."
 
-    assert client.delete(f"/agents/{created['id']}").status_code == 204
+    deleted = client.delete(f"/agents/{created['id']}")
+    assert deleted.status_code == 204
     assert client.get(f"/agents/{created['id']}").status_code == 404
 
 
 def test_unknown_agent_is_404_not_500(client):
     assert client.get("/agents/nope").status_code == 404
-    assert client.put("/agents/nope", json={"name": "x"}).status_code == 404
-    assert client.delete("/agents/nope").status_code == 404
+    patched = client.put("/agents/nope", json={"name": "x"})
+    assert patched.status_code == 404
+    deleted = client.delete("/agents/nope")
+    assert deleted.status_code == 404
 
 
 def test_agent_name_is_required(client):
-    assert client.post("/agents", json={"name": ""}).status_code == 422
+    created = client.post("/agents", json={"name": ""})
+    assert created.status_code == 422
 
 
 def test_update_can_clear_the_voice_profile(client):
@@ -101,7 +111,8 @@ def test_update_can_clear_the_voice_profile(client):
     worth pinning, because getting it wrong silently unsets fields on every save.
     """
     agent = _make_agent(client, voice_profile="v1")
-    assert client.put(f"/agents/{agent['id']}", json={"name": "n"}).json()["voice_profile"] == "v1"
+    patched = client.put(f"/agents/{agent['id']}", json={"name": "n"})
+    assert patched.json()["voice_profile"] == "v1"
     cleared = client.put(f"/agents/{agent['id']}", json={"voice_profile": None})
     assert cleared.json()["voice_profile"] is None
 
@@ -119,7 +130,8 @@ def test_allowlist_normalises_on_write(client):
     listed = client.get("/telephony/allowlist").json()["destinations"]
     assert [d["e164"] for d in listed] == ["+14155550123"]
 
-    assert client.delete("/telephony/allowlist/+14155550123").status_code == 204
+    removed = client.delete("/telephony/allowlist/+14155550123")
+    assert removed.status_code == 204
     assert client.get("/telephony/allowlist").json()["destinations"] == []
 
 
@@ -288,3 +300,36 @@ def test_readiness_reports_llm_state_without_raising(client):
     assert res.status_code == 200
     assert isinstance(res.json()["llm"]["ok"], bool)
     assert res.json()["llm"]["detail"]
+
+
+def test_every_updatable_field_is_a_real_agents_column():
+    """The UPDATE in `update_agent` interpolates column names into SQL.
+
+    Values are bound as parameters, but names cannot be — so the safety of
+    that statement rests entirely on `_UPDATABLE_COLUMNS` containing nothing
+    but real columns. This pins that, and it fails if someone adds a field to
+    `AgentPatch` with no matching column: today that produces an
+    `OperationalError` at runtime on the first PUT that touches it, which is a
+    worse way to find out.
+    """
+    from api.routers.agents import _UPDATABLE_COLUMNS
+
+    with db_conn() as conn:
+        columns = {row[1] for row in conn.execute("PRAGMA table_info(agents)")}
+
+    assert columns, "agents table missing — the schema did not converge"
+    unknown = _UPDATABLE_COLUMNS - columns
+    assert not unknown, f"not columns of `agents`: {sorted(unknown)}"
+
+
+def test_an_unknown_field_cannot_reach_the_update_statement():
+    """The guard in `update_agent`, exercised directly.
+
+    Pydantic makes this unreachable through the API, which is exactly why it
+    is worth a test: the guard exists for the refactor that starts passing a
+    plain dict, and an untested guard is one a future cleanup deletes as dead.
+    """
+    from api.routers.agents import _UPDATABLE_COLUMNS
+
+    assert "id" not in _UPDATABLE_COLUMNS, "the primary key must not be updatable"
+    assert "created_at" not in _UPDATABLE_COLUMNS, "creation time is not updatable"

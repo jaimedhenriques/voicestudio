@@ -72,7 +72,10 @@ export const APP_THEME: Record<string, string> = {
 
 /** The caret SVG the app inlines per theme, stroked in the muted text colour. */
 function selectCaret(stroke: string): string {
-  const hex = stroke.replace('#', '%23');
+  // replaceAll, not replace: `replace` with a string pattern rewrites only the
+  // first occurrence, so any later '#' would survive unencoded into a data:
+  // URI and truncate the SVG at that point.
+  const hex = stroke.replaceAll('#', '%23');
   return (
     'url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22' +
     '%20width%3D%2210%22%20height%3D%226%22%3E%3Cpath%20d%3D%22M1%201l4%204%204-4%22%20' +

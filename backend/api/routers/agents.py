@@ -138,6 +138,13 @@ def get_agent(agent_id: str):
         return _row_to_agent(_load_agent(conn, agent_id))
 
 
+#: Columns ``update_agent`` may name in an UPDATE. Derived from the request
+#: model rather than written out, so adding a field to ``AgentPatch`` cannot
+#: leave a hand-maintained list behind — the two are the same list by
+#: construction.
+_UPDATABLE_COLUMNS = frozenset(AgentPatch.model_fields) | {"updated_at"}
+
+
 @router.put("/agents/{agent_id}")
 def update_agent(agent_id: str, body: AgentPatch):
     fields = body.model_dump(exclude_unset=True)
@@ -147,9 +154,24 @@ def update_agent(agent_id: str, body: AgentPatch):
             if "enabled" in fields:
                 fields["enabled"] = 1 if fields["enabled"] else 0
             fields["updated_at"] = time.time()
+
+            # Values are bound as parameters, but column NAMES cannot be —
+            # they are interpolated into the statement. Pydantic already
+            # guarantees the keys are its own field names, so this cannot
+            # currently fail; it is here so the guarantee is enforced at the
+            # point of interpolation rather than inferred from somewhere else
+            # in the file, and so a future refactor that starts passing a
+            # plain dict fails loudly instead of silently building SQL.
+            unknown = set(fields) - _UPDATABLE_COLUMNS
+            if unknown:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Unknown agent field(s): {', '.join(sorted(unknown))}",
+                )
+
             assignments = ", ".join(f"{k} = ?" for k in fields)
             conn.execute(
-                f"UPDATE agents SET {assignments} WHERE id = ?",
+                f"UPDATE agents SET {assignments} WHERE id = ?",  # noqa: S608 - keys checked above
                 (*fields.values(), agent_id),
             )
         return _row_to_agent(_load_agent(conn, agent_id))

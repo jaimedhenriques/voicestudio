@@ -18,6 +18,11 @@ EXPECTED_EXACT_REGEXES = {
     "^hf_QWERTYUIOPasdfghjklZXCVBNM0123456789xyzAB$",
     "^max_length=400$",
     "^Ed25519PrivateKey$",
+    # Placeholder in a vendored skill's curl example, and a localStorage key.
+    # Both allowlisted as exact values rather than by excluding their paths:
+    # a path exclusion would also hide a real credential committed there.
+    "^YOUR_TOKEN$",
+    r"^omnivoice\.dubSplit\.v1$",
 }
 
 

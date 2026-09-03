@@ -27,4 +27,12 @@ regexes = [
   '''^max_length=400$''',
   # cryptography's Ed25519 private-key type name, not key material.
   '''^Ed25519PrivateKey$''',
+  # The literal placeholder in a vendored skill's curl example
+  # (.agents/skills/test-prompt/SKILL.md). Allowlisted as an exact value
+  # rather than by excluding `.agents/skills/**`: a path exclusion would
+  # also hide a real credential pasted into a skill file, and vendored
+  # third-party docs are exactly where that would go unnoticed.
+  '''^YOUR_TOKEN$''',
+  # localStorage key for the dub split-pane position, not a credential.
+  '''^omnivoice\.dubSplit\.v1$''',
 ]
