@@ -89,3 +89,17 @@ Do not invent a parallel design system.
   targeted set, green locally and in CI.
 - Next increment: run the official ElevenLabs Python SDK against the
   local server with a small real model loaded.
+
+## Increment 2026-09-03 (4) — official SDK end-to-end proof
+
+- Pain: compatibility so far is proven against mocks only; a real
+  ElevenLabs SDK payload has never run against the live server.
+- Scope: scripts/verify_elevenlabs_sdk.py — official elevenlabs SDK
+  pointed at the local server: voices list, text_to_speech.convert with
+  voice_settings.speed, assert real audio bytes. Run for real against
+  KittenTTS (small public CPU model). No dependency changes
+  (uv run --with elevenlabs). Docs record the result.
+- Test gate: the script itself is the evidence; existing suites stay
+  green. Engine blocked: stop and report rather than mocking it away.
+- Next increment: hosted-demo decision, or stability/similarity mapping
+  if an engine grows a genuine equivalent.

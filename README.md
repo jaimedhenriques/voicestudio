@@ -318,6 +318,10 @@ An ElevenLabs-compatible client can point at the local backend by setting its ba
 
 Of `voice_settings`, only `speed` is honoured: a JSON number in the range 0.25–4.0, forwarded to synthesis. `stability`, `similarity_boost` and `style` take a JSON number in the range 0–1, and `use_speaker_boost` takes a JSON boolean; all four are accepted for compatibility and then ignored — no engine here maps them yet. A wrong type, an out-of-range value, or an explicit `null` on any of the five fields returns 422 rather than being silently coerced, clamped, or read as an omission — omit the key instead. `voice_settings` itself may be omitted or `null`, both meaning "no settings".
 
+This is verified end-to-end against the official `elevenlabs` Python SDK, not just against mocks:
+`uv run --with elevenlabs python scripts/verify_elevenlabs_sdk.py --base-url http://localhost:3900 --engine kittentts` drives voice listing, synthesis with and without `voice_settings`, and the validation contract against a running server. It refuses to pass unless the server's active engine matches `--engine`, and every render is decoded with ffprobe (real mp3 stream, non-silent) rather than trusted by byte count.
+The recorded run passed all 19 checks on the KittenTTS engine: `speed: 1.5` produced 1.992s of audio against 3.117s for the same text at 1.0x, a measured 1.57x.
+
 <a id="documentation"></a>
 
 ## Documentation

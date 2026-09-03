@@ -4,12 +4,12 @@
   "company": "Voice Studio",
   "artifactType": "macos-agent",
   "icp": "Creators who need text-to-speech: voiceover, narration, dubbing, and audiobook workflows, not dictation users.",
-  "pain": "The ElevenLabs-compatible endpoint documents a strict voice_settings contract, but an explicit JSON null slips past validation, so a malformed client payload is silently accepted instead of producing the promised 422.",
-  "revenueHypothesis": "A compatibility layer whose documented contract actually holds is what makes creator pipelines trust the local studio as a drop-in replacement; each contract gap erodes that adoption.",
+  "pain": "The ElevenLabs-compatible endpoints are proven only against mocked backends; without an end-to-end run with the official SDK, a real client payload could still fail against the live local server.",
+  "revenueHypothesis": "A documented, repeatable proof that the official ElevenLabs SDK works against the local studio converts compatibility from a claim into evidence, which is what makes creator pipelines switch.",
   "mvpAcceptance": [
-    "POST /v1/text-to-speech/{voice_id} with an explicit JSON null on any voice_settings field (stability, similarity_boost, style, use_speaker_boost, speed) returns 422",
-    "Omitted voice_settings keys keep their current default behavior and omitted voice_settings still defaults speed to 1.0",
-    "New mocked-backend pytest coverage for the null cases passes, and the existing elevenlabs_compat and router smoke suites still pass"
+    "scripts/verify_elevenlabs_sdk.py drives the official elevenlabs Python SDK against a running local server: voices list parses, text_to_speech.convert returns real audio bytes, voice_settings speed is accepted",
+    "The script is executed for real against the small CPU engine (KittenTTS) and the transcript is recorded as evidence",
+    "No repository dependency changes (script runs via uv run --with elevenlabs); existing test suites still pass"
   ],
   "codingTool": "claude-code",
   "maker": "claude-code-maker",
@@ -29,7 +29,7 @@
     "Stop if CI cannot run on the fork or the check run cannot be verified live",
     "Stop if any change would touch LICENSE, store/marketplace paths, GPU/hosted inference, or public copy naming a person"
   ],
-  "rollback": "Revert the single slice commit on branch helix/elevenlabs-voice-settings; no database or settings migrations are introduced.",
+  "rollback": "Revert the single slice commit on branch helix/elevenlabs-voice-settings; the change adds a verification script and docs only, no runtime behavior changes.",
   "evidenceDestination": ".helix/evidence",
   "executionEvidence": ".helix/evidence/execution.json",
   "github": {
@@ -47,13 +47,13 @@
       }
     ],
     "checker": "codex-cli-reviewer",
-    "checkerEvidence": "controller://checker/voice-studio-null-settings-20260903"
+    "checkerEvidence": "controller://checker/voice-studio-sdk-e2e-20260903"
   },
   "vercel": {
     "mode": "not_applicable",
     "category": "macos-agent",
     "exceptionReason": "Voice Studio is a local-first desktop application (Tauri shell plus local FastAPI backend) that runs on the user's own machine; there is no hosted web deployment to verify on Vercel.",
     "runtimeEvidence": ".helix/evidence/runtime.json",
-    "approvalEvidence": "controller://exception/voice-studio-null-settings-vercel-20260903"
+    "approvalEvidence": "controller://exception/voice-studio-sdk-e2e-vercel-20260903"
   }
 }
