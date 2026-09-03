@@ -36,3 +36,24 @@ Do not invent a parallel design system.
 - No Fitch.
 - No personal names on public copy (this plan, marketing, product framing).
 - No merge into Whispvoice.
+
+## Increment 2026-09-03 — ElevenLabs-compatible API shim
+
+- ICP: creators who need TTS inside existing tooling (n8n, video editors,
+  podcast pipelines) that already speak the hosted ElevenLabs API shape.
+- Pain: a local-first studio that does not speak that shape keeps creators
+  paying per-character hosted prices or re-wiring their pipelines.
+- Competitor frame: ElevenLabs-class hosted TTS. We implement protocol
+  compatibility from public API documentation only; no proprietary code,
+  assets, or branding. Public copy says "ElevenLabs API-compatible", never
+  a clone claim.
+- Scope: `POST /v1/text-to-speech/{voice_id}` and `GET /v1/voices` mapped
+  onto the existing engine registry and voice profiles. Backend only; no UI
+  string changes this increment.
+- UX bar: a creator points an existing ElevenLabs integration at the local
+  server, swaps the base URL, and gets audio back. No new screens.
+- Test gate: new mocked-backend pytest coverage for both endpoints, plus the
+  existing router smoke suite, green locally and in CI
+  (`Tests (backend + frontend)`).
+- Next increment: voice_settings (stability/similarity) mapped onto engine
+  options where the active backend supports them.
