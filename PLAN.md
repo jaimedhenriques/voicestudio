@@ -57,3 +57,23 @@ Do not invent a parallel design system.
   (`Tests (backend + frontend)`).
 - Next increment: voice_settings (stability/similarity) mapped onto engine
   options where the active backend supports them.
+
+## Increment 2026-09-03 (2) — voice_settings validation and speed pass-through
+
+- ICP: same creator-TTS wedge; this slice deepens the ElevenLabs-compatible
+  endpoint shipped in the previous increment.
+- Pain: ElevenLabs clients always send voice_settings; silently dropping
+  them produces wrong pacing (speed) for existing pipelines.
+- Scope: validate the public voice_settings fields (stability,
+  similarity_boost, style in 0-1, use_speaker_boost boolean, speed in the
+  backend-supported 0.25-4.0) with 422 on invalid values, and pass
+  voice_settings.speed through to the existing synthesis speed parameter.
+  stability/similarity_boost/style/use_speaker_boost stay explicitly ignored
+  — no engine here maps them — and the docs say so. Backend only.
+- UX bar: a creator's existing integration that sets speed gets the pacing
+  it asked for; invalid payloads get a clear 422, not silent acceptance.
+- Test gate: mocked-backend pytest proves validation 422s and that speed 1.5
+  reaches create_speech as speed=1.5; existing suites stay green.
+- Next increment: run the official ElevenLabs Python SDK against the local
+  server with a small real model loaded, and map stability/similarity if an
+  engine exposes a genuine equivalent.

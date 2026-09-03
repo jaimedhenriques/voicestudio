@@ -316,7 +316,7 @@ An ElevenLabs-compatible client can point at the local backend by setting its ba
 | `POST /v1/text-to-speech/{voice_id}` | TTS from an ElevenLabs-shaped JSON body; `text` required, `model_id` and `voice_settings` optional |
 | `GET /v1/voices` | List local voice profiles in the ElevenLabs voices shape |
 
-`voice_settings` is accepted for compatibility and currently ignored — no engine here maps stability or similarity yet.
+Of `voice_settings`, only `speed` is honoured: a JSON number in the range 0.25–4.0, forwarded to synthesis. `stability`, `similarity_boost` and `style` take a JSON number in the range 0–1, and `use_speaker_boost` takes a JSON boolean; all four are accepted for compatibility and then ignored — no engine here maps them yet. A wrong type or an out-of-range value returns 422 rather than being silently coerced or clamped.
 
 <a id="documentation"></a>
 

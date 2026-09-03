@@ -50,9 +50,11 @@ def _make_engine(tb, eid: str):
             return True, "ready"
 
         calls = 0
+        last_kwargs: dict | None = None
 
         def generate(self, text, **kw) -> torch.Tensor:
             self.calls += 1
+            self.last_kwargs = kw
             return torch.zeros(1, 24000)
 
     return _E
@@ -104,7 +106,7 @@ def active_engine(monkeypatch):
 # ── GET /v1/voices ──────────────────────────────────────────────────────────
 
 
-def test_voices_returns_installed_profiles_in_elevenlabs_shape(client, profile):
+def test_voices_returns_installed_profiles_in_elevenlabs_shape(client, profile) -> None:
     r = client.get("/v1/voices")
     assert r.status_code == 200, r.text
     body = r.json()
@@ -127,7 +129,7 @@ def test_voices_returns_installed_profiles_in_elevenlabs_shape(client, profile):
 # ── POST /v1/text-to-speech/{voice_id} ──────────────────────────────────────
 
 
-def test_text_to_speech_returns_audio_bytes(client, profile, monkeypatch):
+def test_text_to_speech_returns_audio_bytes(client, profile, monkeypatch) -> None:
     svc = _tts_mod()
     monkeypatch.setitem(
         svc._REGISTRY, "fake-eleven", _make_engine(svc, "fake-eleven")
@@ -144,7 +146,7 @@ def test_text_to_speech_returns_audio_bytes(client, profile, monkeypatch):
     assert len(r.content) > 0
 
 
-def test_voice_settings_are_accepted_and_ignored(client, profile, monkeypatch):
+def test_voice_settings_are_accepted_and_ignored(client, profile, monkeypatch) -> None:
     """An ElevenLabs client always sends voice_settings; refusing it over a knob
     we cannot honour would fail the integration outright."""
     svc = _tts_mod()
@@ -164,7 +166,7 @@ def test_voice_settings_are_accepted_and_ignored(client, profile, monkeypatch):
     assert r.headers["content-type"].startswith("audio/")
 
 
-def test_eleven_model_id_maps_to_the_active_engine(client, profile, active_engine):
+def test_eleven_model_id_maps_to_the_active_engine(client, profile, active_engine) -> None:
     """The real drop-in path: an ElevenLabs client sends its own hosted model
     name, which we don't have. It must route to the active engine the way
     openai_compat's 'tts-1' alias does, not 400 the request."""
@@ -178,14 +180,14 @@ def test_eleven_model_id_maps_to_the_active_engine(client, profile, active_engin
     assert active_engine.calls == 1
 
 
-def test_omitted_model_id_maps_to_the_active_engine(client, profile, active_engine):
+def test_omitted_model_id_maps_to_the_active_engine(client, profile, active_engine) -> None:
     r = client.post(f"/v1/text-to-speech/{profile}", json={"text": "hello"})
     assert r.status_code == 200, r.text
     assert r.headers["content-type"].startswith("audio/")
     assert active_engine.calls == 1
 
 
-def test_unknown_voice_id_is_404(client):
+def test_unknown_voice_id_is_404(client) -> None:
     r = client.post(
         "/v1/text-to-speech/no-such-voice-id", json={"text": "hello"}
     )
@@ -193,13 +195,125 @@ def test_unknown_voice_id_is_404(client):
     assert "no-such-voice-id" in r.json()["detail"]
 
 
-def test_empty_text_is_422(client, profile):
+def test_empty_text_is_422(client, profile) -> None:
     """Validation runs before the handler, so an empty body is refused without
     ever reaching an engine — a 422, not a 400 from deep inside synthesis."""
     r = client.post(f"/v1/text-to-speech/{profile}", json={"text": ""})
     assert r.status_code == 422, r.text
 
 
-def test_missing_text_is_422(client, profile):
+def test_missing_text_is_422(client, profile) -> None:
     r = client.post(f"/v1/text-to-speech/{profile}", json={})
     assert r.status_code == 422, r.text
+
+
+# ── voice_settings ──────────────────────────────────────────────────────────
+
+
+def test_speed_in_voice_settings_reaches_synthesis(client, profile, active_engine) -> None:
+    """`speed` is the one honoured knob — assert it lands in the engine call,
+    not merely that the request was accepted."""
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={"text": "hello", "voice_settings": {"speed": 1.5}},
+    )
+    assert r.status_code == 200, r.text
+    assert active_engine.last_kwargs["speed"] == 1.5
+
+
+def test_omitted_voice_settings_leaves_the_default_speed(client, profile, active_engine) -> None:
+    """No speed given must mean SpeechRequest's own default, not a value this
+    router invented — the default stays single-sourced."""
+    r = client.post(f"/v1/text-to-speech/{profile}", json={"text": "hello"})
+    assert r.status_code == 200, r.text
+    assert active_engine.last_kwargs["speed"] == 1.0
+
+
+def test_ignored_settings_do_not_reach_synthesis(client, profile, active_engine) -> None:
+    """stability/similarity_boost/style/use_speaker_boost are accepted and
+    ignored — they must not be smuggled into the engine kwargs."""
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={
+            "text": "hello",
+            "voice_settings": {
+                "stability": 0.5,
+                "similarity_boost": 0.75,
+                "style": 0.3,
+                "use_speaker_boost": True,
+                "speed": 1.25,
+            },
+        },
+    )
+    assert r.status_code == 200, r.text
+    kw = active_engine.last_kwargs
+    assert kw["speed"] == 1.25
+    for ignored in ("stability", "similarity_boost", "style", "use_speaker_boost"):
+        assert ignored not in kw
+
+
+@pytest.mark.parametrize(
+    "settings",
+    [
+        pytest.param({"stability": 2.0}, id="stability-above-1"),
+        pytest.param({"stability": -0.1}, id="stability-below-0"),
+        pytest.param({"similarity_boost": 1.5}, id="similarity_boost-above-1"),
+        pytest.param({"style": 1.5}, id="style-above-1"),
+        pytest.param({"speed": 0.1}, id="speed-below-min"),
+        pytest.param({"speed": 9.0}, id="speed-above-max"),
+    ],
+)
+def test_out_of_range_voice_settings_are_422(client, profile, settings) -> None:
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={"text": "hello", "voice_settings": settings},
+    )
+    assert r.status_code == 422, r.text
+
+
+@pytest.mark.parametrize(
+    "settings",
+    [
+        # Pydantic's lax mode coerces every one of these into a valid-looking
+        # value (bool is an int subclass; "1.5" parses as a float), so a
+        # mistyped client payload would be accepted as if it were real.
+        pytest.param({"use_speaker_boost": 1}, id="use_speaker_boost-int"),
+        pytest.param({"use_speaker_boost": 0}, id="use_speaker_boost-zero"),
+        pytest.param({"use_speaker_boost": "true"}, id="use_speaker_boost-str"),
+        pytest.param({"use_speaker_boost": "loud"}, id="use_speaker_boost-nonsense-str"),
+        pytest.param({"stability": True}, id="stability-bool"),
+        pytest.param({"similarity_boost": False}, id="similarity_boost-bool"),
+        pytest.param({"style": True}, id="style-bool"),
+        pytest.param({"speed": True}, id="speed-bool"),
+        pytest.param({"speed": "1.5"}, id="speed-numeric-str"),
+        pytest.param({"stability": "0.5"}, id="stability-numeric-str"),
+    ],
+)
+def test_wrong_scalar_types_are_422_not_coerced(client, profile, settings) -> None:
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={"text": "hello", "voice_settings": settings},
+    )
+    assert r.status_code == 422, r.text
+
+
+@pytest.mark.parametrize(
+    "settings, expected_speed",
+    [
+        # JSON ints are legitimate for these knobs — rejecting them (as
+        # StrictFloat would) breaks real clients that send 0 or 1.
+        pytest.param({"stability": 1}, 1.0, id="stability-int"),
+        pytest.param({"similarity_boost": 0}, 1.0, id="similarity_boost-int-zero"),
+        pytest.param({"speed": 2}, 2.0, id="speed-int"),
+        pytest.param({"use_speaker_boost": True}, 1.0, id="use_speaker_boost-real-bool"),
+    ],
+)
+def test_int_and_bool_literals_are_accepted(
+    client, profile, active_engine, settings, expected_speed
+) -> None:
+    r = client.post(
+        f"/v1/text-to-speech/{profile}",
+        json={"text": "hello", "voice_settings": settings},
+    )
+    assert r.status_code == 200, r.text
+    assert active_engine.last_kwargs["speed"] == expected_speed

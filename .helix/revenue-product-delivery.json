@@ -4,19 +4,19 @@
   "company": "Voice Studio",
   "artifactType": "macos-agent",
   "icp": "Creators who need text-to-speech: voiceover, narration, dubbing, and audiobook workflows, not dictation users.",
-  "pain": "Creator tooling (n8n, video editors, podcast pipelines) already integrates the hosted ElevenLabs API shape; a local-first studio that does not speak that shape forces creators to keep paying per-character hosted prices.",
-  "revenueHypothesis": "An ElevenLabs-compatible local endpoint makes Voice Studio a drop-in replacement in existing creator pipelines, converting hosted-API spend into Voice Studio adoption and future paid support.",
+  "pain": "Creator tooling already integrates the hosted ElevenLabs API shape, and those clients send voice_settings such as speed; silently dropping them makes the local endpoint produce the wrong narration pacing for existing pipelines.",
+  "revenueHypothesis": "Honoring voice_settings.speed makes the ElevenLabs-compatible endpoint behaviorally compatible for real client payloads, deepening drop-in adoption of the local studio in paid creator workflows.",
   "mvpAcceptance": [
-    "POST /v1/text-to-speech/{voice_id} accepts an ElevenLabs-shaped JSON body (text, model_id, voice_settings) and returns audio bytes",
-    "GET /v1/voices returns installed voice profiles in the ElevenLabs-shaped voices list",
-    "New pytest coverage for both endpoints passes with a mocked TTS backend and the existing router smoke suite still passes"
+    "POST /v1/text-to-speech/{voice_id} validates voice_settings types and ranges (stability, similarity_boost, style in 0-1; speed in the backend-supported 0.25-4.0; use_speaker_boost boolean) and rejects invalid values with 422",
+    "voice_settings.speed is passed through to the existing synthesis speed parameter so a request with speed 1.5 produces audio synthesized at speed 1.5",
+    "New mocked-backend pytest coverage for validation and speed pass-through passes, and the existing elevenlabs_compat and router smoke suites still pass"
   ],
   "codingTool": "claude-code",
   "maker": "claude-code-maker",
   "copySafety": {
     "proprietaryAssetsExcluded": true,
     "publicPatternSources": [
-      "ElevenLabs public API documentation request/response field shapes only; no proprietary code, assets, or branding copied"
+      "ElevenLabs public API documentation voice_settings field names and ranges only; no proprietary code, assets, or branding copied"
     ]
   },
   "limits": {
@@ -25,17 +25,17 @@
     "maxAttempts": 3
   },
   "stopConditions": [
-    "Stop after this single increment once the draft PR is open and independently verified",
+    "Stop after this single slice once the draft PR is open and independently verified",
     "Stop if CI cannot run on the fork or the check run cannot be verified live",
-    "Stop if any change would touch LICENSE, store/marketplace paths, or public copy naming a person"
+    "Stop if any change would touch LICENSE, store/marketplace paths, GPU/hosted inference, or public copy naming a person"
   ],
-  "rollback": "Revert the single increment commit on branch helix/elevenlabs-compat-api and close the draft PR; no database or settings migrations are introduced.",
+  "rollback": "Revert the single slice commit on branch helix/elevenlabs-voice-settings and close the draft PR; no database or settings migrations are introduced.",
   "evidenceDestination": ".helix/evidence",
   "executionEvidence": ".helix/evidence/execution.json",
   "github": {
     "repo": "jaimedhenriques/voicestudio",
     "remote": "origin",
-       "branch": "helix/elevenlabs-compat-api",
+    "branch": "helix/elevenlabs-voice-settings",
     "baseBranch": "main",
     "commit": "HEAD"
   },
@@ -47,13 +47,13 @@
       }
     ],
     "checker": "codex-cli-reviewer",
-    "checkerEvidence": "controller://checker/voice-studio-el-compat-20260903"
+    "checkerEvidence": "controller://checker/voice-studio-voice-settings-20260903"
   },
   "vercel": {
     "mode": "not_applicable",
     "category": "macos-agent",
     "exceptionReason": "Voice Studio is a local-first desktop application (Tauri shell plus local FastAPI backend) that runs on the user's own machine; there is no hosted web deployment to verify on Vercel.",
     "runtimeEvidence": ".helix/evidence/runtime.json",
-    "approvalEvidence": "controller://exception/voice-studio-el-compat-vercel-20260903"
+    "approvalEvidence": "controller://exception/voice-studio-voice-settings-vercel-20260903"
   }
 }

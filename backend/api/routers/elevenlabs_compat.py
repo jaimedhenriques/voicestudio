@@ -16,6 +16,11 @@ directly, so engine resolution, the routing gate, single-engine-resident
 eviction, the model-load budget, GPU admission control and invisible provenance
 watermarking are the exact same code path — not a second copy that can drift.
 
+Of ElevenLabs' ``voice_settings``, only ``speed`` is honoured — it maps onto the
+synthesis speed parameter. ``stability``, ``similarity_boost``, ``style`` and
+``use_speaker_boost`` are validated and then ignored, because no engine here
+exposes an equivalent; a request is never refused over a knob we cannot honour.
+
 Auth is the app-wide ``BearerKeyMiddleware``, identical to ``openai_compat`` and
 ``openai_chat``: nothing here adds or bypasses a check.
 
@@ -27,12 +32,60 @@ from typing import Any, Optional
 
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import Response
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StrictBool, field_validator
 
 router = APIRouter(prefix="/v1", tags=["ElevenLabs-Compatible API"])
 
 
 # ── Schemas ─────────────────────────────────────────────────────────────────
+
+
+class VoiceSettings(BaseModel):
+    """ElevenLabs' `voice_settings` object.
+
+    Every field is optional and validated, so an out-of-range value is refused
+    with a 422 rather than silently clamped. Only `speed` is honoured — see the
+    field descriptions for what each one does here.
+    """
+
+    stability: Optional[float] = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Accepted and ignored — no engine here exposes an equivalent.",
+    )
+    similarity_boost: Optional[float] = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Accepted and ignored — no engine here exposes an equivalent.",
+    )
+    style: Optional[float] = Field(
+        default=None, ge=0.0, le=1.0,
+        description="Accepted and ignored — no engine here exposes an equivalent.",
+    )
+    use_speaker_boost: Optional[StrictBool] = Field(
+        default=None,
+        description="Accepted and ignored — no engine here exposes an equivalent.",
+    )
+    speed: Optional[float] = Field(
+        default=None, ge=0.25, le=4.0,
+        description=(
+            "Honoured: forwarded to the synthesis speed parameter. The accepted "
+            "range is this backend's 0.25–4.0, a superset of ElevenLabs' 0.7–1.2."
+        ),
+    )
+
+    @field_validator("stability", "similarity_boost", "style", "speed", mode="before")
+    @classmethod
+    def _numbers_only(cls, v: Any) -> Any:
+        """Refuse JSON scalars that only *look* like numbers.
+
+        Pydantic's lax mode coerces `true` → 1.0 (bool is an int subclass) and
+        `"1.5"` → 1.5, so a mistyped payload would be accepted as a real value
+        instead of reported. Plain ints stay valid — clients do send 0 and 1
+        for these knobs — which is why this is a before-validator and not
+        StrictFloat.
+        """
+        if isinstance(v, (bool, str)):
+            raise ValueError("must be a number, not a boolean or string")
+        return v
 
 
 class TextToSpeechRequest(BaseModel):
@@ -54,12 +107,18 @@ class TextToSpeechRequest(BaseModel):
             "engine, as do VoiceStudio engine IDs (omnivoice, voxcpm2, …)."
         ),
     )
-    voice_settings: Optional[dict[str, Any]] = Field(
+    voice_settings: Optional[VoiceSettings] = Field(
         default=None,
         description=(
-            "Accepted and ignored. ElevenLabs' stability/similarity_boost knobs "
-            "have no equivalent in the engine options this backend exposes; the "
-            "request is not refused over a knob we cannot honour."
+            "Optional. `speed` is honoured: forwarded to the synthesis speed "
+            "parameter, JSON numbers only (no booleans or strings), range "
+            "0.25–4.0. `stability`, `similarity_boost` and `style` are JSON "
+            "numbers only (no booleans or strings), range 0–1, then ignored. "
+            "`use_speaker_boost` is JSON booleans only (no 0/1, no \"true\"), "
+            "then ignored. The four ignored fields have no equivalent in any "
+            "engine here, but a request is never refused over a knob we cannot "
+            "honour. A wrong type or an out-of-range value is a 422, never a "
+            "silent coercion or clamp."
         ),
     )
 
@@ -119,11 +178,17 @@ async def text_to_speech(voice_id: str, req: TextToSpeechRequest) -> Response:
     if not model or model.startswith("eleven"):
         model = "tts-1"
 
+    # Only `speed` crosses over. Omitting it leaves SpeechRequest's own default
+    # as the single source of truth for what "no speed given" means.
+    speed = req.voice_settings.speed if req.voice_settings else None
+    extra = {} if speed is None else {"speed": speed}
+
     return await create_speech(
         SpeechRequest(
             model=model,
             input=req.text,
             voice=voice_id,
             response_format="mp3",
+            **extra,
         )
     )
