@@ -307,6 +307,17 @@ npx skills add debpalash/omnivoice-studio
 
 The [notebook](notebooks/OmniVoice_Studio_Colab.ipynb) runs the app and web UI on a Colab GPU. Colab is remote compute, so uploaded audio and project data do not remain local to your machine.
 
+## ElevenLabs-compatible API
+
+An ElevenLabs-compatible client can point at the local backend by setting its base URL to `http://localhost:3900`:
+
+| Endpoint | Purpose |
+|---|---|
+| `POST /v1/text-to-speech/{voice_id}` | TTS from an ElevenLabs-shaped JSON body; `text` required, `model_id` and `voice_settings` optional |
+| `GET /v1/voices` | List local voice profiles in the ElevenLabs voices shape |
+
+`voice_settings` is accepted for compatibility and currently ignored — no engine here maps stability or similarity yet.
+
 <a id="documentation"></a>
 
 ## Documentation

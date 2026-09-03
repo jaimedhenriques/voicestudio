@@ -669,6 +669,7 @@ def _phase_a_build_inner() -> None:
         dictation,
         openai_compat,
         openai_chat,  # OpenAI-compatible /v1/chat/completions relay
+        elevenlabs_compat,  # ElevenLabs-compatible /v1/voices + /v1/text-to-speech
         tts_stream,
         marketplace,
         personas,
@@ -688,7 +689,8 @@ def _phase_a_build_inner() -> None:
         dub_export, dub_translate, projects, glossary, engines, tools,
         stories, setup, gallery, archetypes, describe_voice, community,
         batch, watermark, events, capture, capture_ws, dictation,
-        openai_compat, openai_chat, tts_stream, marketplace, personas, sonitranslate,
+        openai_compat, openai_chat, elevenlabs_compat, tts_stream, marketplace,
+        personas, sonitranslate,
         audiobook, longform_jobs, pronunciation, settings_router,
         media_tools_router, auth_router, _mcp_bindings_router, workers_router,
         agents_router,
